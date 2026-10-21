@@ -2,7 +2,7 @@
 import sys;sys.path.insert(0,'/workspace/covers');sys.path.insert(0,'/workspace/melissaette-bday-c38938')
 from PIL import Image,ImageDraw
 import gen,tools_sprite as ts
-F=gen.F;F2=dict(F);F2[',']=['..','..','..','..','..','.#','#.']
+F=gen.F;F2=dict(F);F2[',']=['..','..','..','..','.#','.#','#.']
 def text(d,x,y,s,col,sc,shadow=None):
   old=gen.F;gen.F=F2
   try:gen.text(d,x,y,s,col,sc,shadow=shadow)
@@ -29,8 +29,8 @@ def frame(t=0):
   castle(d,900,500,3)
   d.ellipse([560,460,980,640],fill='#21b03b');d.ellipse([820,470,1240,660],fill='#1a8a30')
   R(d,px,500,PW,80,'#21b03b');R(d,px,500,PW,6,'#5edc78')
-  rows=ts.happy() if t%4==3 else ts.ROWS;s=8;mx=650+(t%2)*2
-  ts.draw(d,mx,500-24*s-(4 if t%2 else 0),s,rows)
+  por=Image.open(f'/workspace/melissaette-bday-c38938/art/anim/mel_{max(t,0)%8}.png' if t>=0 else '/workspace/melissaette-bday-c38938/art/mel_portrait_wave.png').convert('RGBA')
+  ph=330;pw=int(por.width*ph/por.height);por=por.resize((pw,ph),Image.LANCZOS);im.paste(por,(735-pw//2,506-ph),por)
   for i in range(6):candle(d,1010+i*22,482,3,(t+i)%2)
   R(d,0,0,px,H,'#000000');R(d,px+PW,0,W,H,'#000000');R(d,0,0,W,52,'#000000');R(d,0,580,W,H,'#000000')
   R(d,px,52,PW,4,'#ffffff');R(d,px,576,PW,4,'#ffffff')

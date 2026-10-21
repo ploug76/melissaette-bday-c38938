@@ -1,4 +1,5 @@
 test/*.png
 __pycache__/
-art/
+art/*.png
+art/anim/
 test/*.jpg

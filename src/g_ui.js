@@ -4,7 +4,7 @@ function setBanner(s,col){if(banner&&banner.s==s)return;bannerQ.push({s,col:col|
 function nextBanner(){banner=bannerQ.shift()||null;if(banner)banner.t=0}
 function hudItems(){const it=[];const sk=SK[G.skill];
  it.push({k:'score',w:0,draw:(x,y,h,f)=>{txt('SCORE '+String(G.score).padStart(6,'0'),x+8,y+h/2,f,'#ffd84a','left',{f:MONO})},text:'SCORE 000000',mono:1});
- it.push({k:'lives',text:'×'+G.lives+'  ',icon:1,draw:(x,y,h,f)=>{const s=(h-4)/24;const ox=g.getTransform();g.imageSmoothingEnabled=false;g.drawImage(SPR.mel.r.happy,x+6,y+2,16*s,24*s);txt('×'+G.lives,x+8+16*s+2,y+h/2,f,'#fff','left',{f:MONO})}});
+ it.push({k:'lives',text:'×'+G.lives+'  ',icon:1,draw:(x,y,h,f)=>{const s=(h-4)/24;const ox=g.getTransform();g.imageSmoothingEnabled=false;g.drawImage(SPR.mel.r.stand,x+4,y+2,18*s,24*s);txt('×'+G.lives,x+8+16*s+2,y+h/2,f,'#fff','left',{f:MONO})}});
  it.push({k:'energy',text:'ENERGY ##########',bar:1,draw:(x,y,h,f,w)=>{const lw=txt('ENERGY',x+8,y+h/2,f*.8,'#fff','left');const bx=x+8+lw+6,bw=w-(bx-x)-8;rr(bx,y+h/2-6,bw,12,4,'#2a2440','#fff',1.5);
   if(!sk.drain||ZONES[G.zi].boss){txt(sk.drain?'BOSS!':'∞ STROLL',bx+bw/2,y+h/2+1,f*.75,'#5edc78','center')}else{const e=G.energy/100,col=e>.5?'#5edc78':e>.2?'#ffd84a':'#fc5554';const flash=e<.2&&Math.floor(gt*4)%2;rr(bx+2,y+h/2-4,Math.max(2,(bw-4)*e),8,3,flash?'#fff':col)}}});
  it.push({k:'candles',text:'🕯 54/54',draw:(x,y,h,f)=>{g.save();g.translate(x+8,y+h/2+6);g.scale(1.3,1.3);g.imageSmoothingEnabled=false;candle(3,0,gt,false);g.restore();txt(foundEver.length+'/'+TOTAL_CANDLES,x+22,y+h/2,f,'#ff86a6','left',{f:MONO})}});
@@ -45,11 +45,13 @@ function drawTitle(){const L=LY;dimAll(.35);const cx=L.L+L.aw/2,best=ST.get('bes
  const artTop=y,artBot=two?L.B-74:by-14,side=Math.min(artBot-artTop,colW,420);
  if(side>60){const ax=Math.round(lx-side/2),ay=Math.round(artTop+(artBot-artTop-side)/2);rr(ax-5,ay-5,side+10,side+10,8,'#d4524d','#fff',3);
   if(TITLE_IMG.complete&&TITLE_IMG.naturalWidth){g.save();g.imageSmoothingEnabled=true;g.drawImage(TITLE_IMG,ax,ay,side,side);g.restore()}else R(ax,ay,side,side,'#1b1440');
-  reg('titleart',ax-5,ay-5,side+10,side+10)}
+  reg('titleart',ax-5,ay-5,side+10,side+10);
+  // Melissaette herself, stepping out of the box art
+  drawMelPortrait(ax+side*.82,ay+side+3,side*.6,Math.floor(gt/3)%3==2?'wave':'smile',gt)}
  bl.forEach((b,i)=>button(b[0],bx,by+i*(bh+gap),bw,bh,b[1],b[2],{sz:18}));
  const iy=by+bl.length*(bh+gap)+10;const is=fitSize(info,13,bw+40,'bold',MONO);txt(info,two?bx+bw/2:cx,iy,is,'#ffd84a','center',{f:MONO,stroke:3,sc:'#000'});g.font=font(is,'bold',MONO);const iw=g.measureText(info).width;reg('info',(two?bx+bw/2:cx)-iw/2,iy-is/2-1,iw,is+2)}
 const TITLE_IMG=new Image();TITLE_IMG.src='title.jpg';
-function drawFolkAt(id,fr,x,y,s){g.drawImage(SPR[id].r[fr],Math.round(x-8*s),Math.round(y-24*s),16*s,24*s)}
+function drawFolkAt(id,fr,x,y,s){const sp=SPR[id].r[fr],k=sp.width>16?.75:1;g.drawImage(sp,Math.round(x-sp.width*k*s/2),Math.round(y-sp.height*k*s),sp.width*k*s,sp.height*k*s)}
 function cycleSkill(){skill=skill%4+1;ST.set('skill',skill)}
 function panel(title,lines,btns,col='#ffd84a'){const L=LY,w=Math.min(340,L.aw-24);let h=60+lines.length*22+btns.length*54+10;const x=L.L+(L.aw-w)/2,y=Math.max(L.T+54,L.T+(L.ah-h)/2);
  rr(x,y,w,h,16,'rgba(16,10,44,.94)','#fff',3);const ts=fitSize(title,26,w-30);txt(title,x+w/2,y+30,ts,col,'center',{stroke:4,sc:'#000'});reg('ptitle',x+15,y+30-ts/2,w-30,ts);
@@ -64,7 +66,7 @@ let sceneT=0;
 function drawParadeWorld(t){drawBG('meadow',t,6);const T=TH.meadow;R(0,GY,FW,FH-GY,T.dirt);R(0,GY,FW,4,T.top);R(0,GY+4,FW,2,T.top2);drawCastleFar(150,GY-10,1.1,'#5a4a8a');
  for(let i=0;i<10;i++){const x=(i*29+t*40)%(FW+20)-10;R(x,10+(i%3)*8,3,3,['#ff7978','#ffd84a','#42ebf5','#5edc78'][i%4])}
  const order=['mel',...G.friends.slice().sort((a,b)=>a-b).map(i=>FRIENDS[i][0])];const lead=Math.min(FW-20,-30+t*42);
- order.forEach((id,i)=>{const x=lead-i*22;if(x<-12)return;const hop=Math.abs(Math.sin(t*7+i))*4;drawFolk(id,Math.floor(t*6+i)%2?'w1':'w2',x,GY-hop,1);if(i==0&&t>6)drawFolk(id,'happy',x,GY-hop,1)});
+ order.forEach((id,i)=>{const x=lead-i*22;if(x<-12)return;const hop=Math.abs(Math.sin(t*7+i))*4;drawFolk(id,Math.floor(t*6+i)%2?'w1':'w2',x,GY-hop,1);if(i==0&&t>6)drawFolk(id,Math.floor(t*3)%2?'cheer':'happy',x,GY-hop,1)});
  // the outsmarted villains, sulking in the net
  for(let i=-12;i<=12;i+=4)R(214+i,GY-38,1,38,'#e6ce80');wizard(214,GY,-1,t,'');cat(232,GY,-1,t,'sit');for(let j=0;j<38;j+=5)R(202,GY-38+j,25,1,'#e6ce80')}
 function drawCakeWorld(t){R(0,0,FW,FH,'#2a1a4a');for(let i=0;i<30;i++){const x=(i*53)%FW,y=(i*37)%70,k=Math.floor(t*3+i)%5==0;R(x,y,k?2:1,k?2:1,'#fff')}
@@ -74,9 +76,14 @@ function drawCakeWorld(t){R(0,0,FW,FH,'#2a1a4a');for(let i=0;i<30;i++){const x=(
  tiers.forEach(([w,h,y,n],ti)=>{R(cx-w/2,y,w,h,['#ff86a6','#fff0f6','#ffd0de'][ti]);R(cx-w/2,y,w,4,'#ffffff');for(let i=0;i<w;i+=6)R(cx-w/2+i,y+4,3,2+(i%12?0:2),'#ffffff');R(cx-w/2,y+h-3,w,3,['#d4524d','#c95bba','#5455ed'][ti]);
   for(let i=0;i<n;i++){const x=cx-w/2+3+i*(w-6)/(n-1);R(x,y-6,2,6,['#5455ed','#ffd84a','#5edc78','#42ebf5'][i%4]);const f=Math.floor(t*10+i)%3;R(x,y-9-f%2,2,3,'#ffb020');R(x,y-8-f%2,1,1,'#fff6a0')}});
  txt2('54',cx,GY-14,'#d4524d');
- const order=['mel',...G.friends.slice().sort((a,b)=>a-b).map(i=>FRIENDS[i][0])];const slots=[[cx-80,0],[cx+80,0],[cx-100,0],[cx+100,0],[cx-118,0],[cx+118,0],[cx-62,0],[cx+62,0]];
- order.forEach((id,i)=>{const [x]=slots[i];const hop=Math.max(0,Math.sin(t*4+i))*3;drawFolk(id,Math.floor(t*2+i)%3?'happy':'stand',x,GY-hop,x<cx?1:-1);if(Math.floor(t*2+i)%4==0){R(x+(x<cx?8:-10),GY-34-((t*20+i*5)%14),2,5,'#fff');R(x+(x<cx?8:-10),GY-34-((t*20+i*5)%14),4,2,'#fff')}});
- g.save();g.translate(22,GY);g.scale(.8,.8);wizard(0,0,1,t,'');g.restore();R(16,GY-33,10,3,'#ffd84a');R(18,GY-37,6,4,'#ff5f8f');R(20,GY-40,2,3,'#ffd84a');cat(240,GY,-1,t,'sit');R(236,GY-21,8,2,'#ffd84a');R(238,GY-25,4,4,'#42ebf5');
+ // friends on the right: a back row on a little bench + a front row
+ const order=G.friends.slice().sort((a,b)=>a-b).map(i=>FRIENDS[i][0]);const slots=[[186,GY-12],[204,GY-12],[222,GY-12],[240,GY-12],[195,GY],[213,GY],[231,GY]];
+ R(178,GY-12,74,3,'#a0643a');R(180,GY-9,3,9,'#7a4a2a');R(246,GY-9,3,9,'#7a4a2a');
+ order.forEach((id,i)=>{const [x,y]=slots[i];const hop=Math.max(0,Math.sin(t*4+i))*3;drawFolk(id,Math.floor(t*2+i)%3?'happy':'stand',x,y-hop,-1);if(Math.floor(t*2+i)%4==0){R(x-10,y-34-((t*20+i*5)%14),2,5,'#fff');R(x-10,y-34-((t*20+i*5)%14),4,2,'#fff')}});
+ // Melissaette, big and detailed, waving next to her cake
+ drawMelPortrait(55,GY+1,66,'wave',t);
+ g.save();g.translate(12,GY);g.scale(.8,.8);wizard(0,0,1,t,'');g.restore();R(6,GY-33,10,3,'#ffd84a');R(8,GY-37,6,4,'#ff5f8f');R(10,GY-40,2,3,'#ffd84a');
+ g.save();g.translate(27,GY);g.scale(.75,.75);cat(0,0,1,t,'sit');g.restore();R(25,GY-16,6,2,'#ffd84a');R(26,GY-19,4,3,'#42ebf5');
  if(Math.random()<.5&&!paused)for(let k=0;k<2;k++)part(Math.random()*FW,-4,(Math.random()-.5)*30,20+Math.random()*30,['#ff7978','#ffd84a','#42ebf5','#5edc78','#c95bba','#fff'][Math.floor(Math.random()*6)],3,2,20)}
 function txt2(s,x,y,col){g.font='bold 12px '+MONO;g.textAlign='center';g.textBaseline='middle';g.fillStyle=col;g.fillText(s,x,y)}
 const LYR=['Happy birthday to you','Happy birthday to you','Happy birthday, dear Melissa','Happy birthday to you!'];

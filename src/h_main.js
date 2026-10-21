@@ -1,6 +1,6 @@
 // ---------- flow
 let state='title',paused=false,panelOpen=false,skill=CL(ST.get('skill',2),1,4),foundEver=ST.get('candles',[]),gt=0,overAt=-9,acc=0,cakeSongT=0,cakeReplay=false;
-function start(){A();G=newGame(skill);state='play';paused=false;PARTS=[];POPS=[];bannerQ=[];banner=null;laneMsg=null;setBanner(ZONES[0].taunt,'#ffd84a');playSong(ZONES[0].music);chrome()}
+function start(){A();G=newGame(skill);state='play';paused=false;PARTS=[];POPS=[];bannerQ=[];banner=null;laneMsg=null;setBanner(ZONES[0].taunt,'#ffd84a');songBanner(ZONES[0].music);playSong(ZONES[0].music);chrome()}
 function toTitle(){state='title';paused=false;G=null;PARTS=[];POPS=[];banner=null;bannerQ=[];laneMsg=null;playSong('title');chrome()}
 function gameOver(){state='over';overAt=gt;const hs=ST.get('scores',[]);const e={s:G.score,k:G.skill,r:G.round};hs.push(e);hs.sort((a,b)=>b.s-a.s);G.rank=hs.indexOf(e);if(G.rank>4)G.rank=-1;ST.set('scores',hs.slice(0,5));
  const best=ST.get('best',0);G.newBest=G.score>best&&G.score>0;if(G.newBest)ST.set('best',G.score);SFX.over();song=null;chrome()}
@@ -9,7 +9,7 @@ function endParade(){if(foundEver.length>=TOTAL_CANDLES)toCake(false);else nextR
 function toCake(replay){cakeReplay=replay;if(replay&&!G){G=newGame(skill);G.friends=[0,1,2,3,4,5,6];G.cont=false}else if(G)G.cont=!replay||G.cont;state='cake';sceneT=0;cakeSongT=-.3;PARTS=[];playSong('bday',true);chrome()}
 function endCake(){if(cakeReplay&&!G.cont){toTitle();return}nextRound()}
 function nextRound(){G.round++;G.ri=0;G.entryX=10;G.friends=[];G.found=[];G.gifts=[];G.energy=100;G.ph='play';G.p=newPlayer(10);buildScreen(G,1);state='play';laneMsg=null;
- setBanner(`Round ${G.round}! More lands, faster critters!`,'#ffd84a');playSong(ZONES[0].music);chrome()}
+ setBanner(`Round ${G.round}! More lands, faster critters!`,'#ffd84a');songBanner(ZONES[0].music);playSong(ZONES[0].music);chrome()}
 function togglePause(){if(state!='play')return;paused=!paused;held={l:0,r:0,d:0,j:0};ptrs.clear();chrome()}
 function chrome(){$('pause').style.display=state=='play'?'block':'none';$('mute').style.display='block';$('help').style.display=state=='title'||state=='play'?'block':'none';$('pause').textContent=paused?'▶':'⏸';$('pause').setAttribute('aria-label',paused?'Resume':'Pause');try{if(window.__dock)__dock.tick()}catch(e){}}
 function showHelp(){if(state=='play'&&!paused)togglePause();panelOpen=true;$('ptext').innerHTML=`<h2>👒 Melissaette: Rescue in Gargamel's Castle</h2>
@@ -18,7 +18,7 @@ function showHelp(){if(state=='play'&&!paused)togglePause();panelOpen=true;$('pt
 <h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
 <h3>Energy</h3><p>Her energy drains as she walks and refills only when she reaches a <b>new land</b>. Leftover energy is bonus points!</p>
 <h3>Gifts</h3><ul><li>🫧 Bubble shield: saves you from one oops.</li><li>👟 Spring shoes: higher jumps for 20 s.</li><li>🐌 Snail-time: slows critters and villains.</li><li>🧁 Cupcake: +50 energy.</li></ul>
-<h3>🕯️ 54 birthday candles</h3><p>54 candles are hidden along the way. Some only appear when you get close, and some need a high jump or a Big Leap. Candles you've found stay found on this device. Find all 54 for a secret birthday surprise at the end!</p>
+<h3>🎵 Soundtrack</h3><p>Every land plays its own 8-bit 80s movie hit: Pretty in Pink, Don't You (Forget About Me), Footloose, Girls Just Want to Have Fun, The Power of Love, Take My Breath Away, Ghostbusters and Danger Zone, with The Time of My Life on the title and parade.</p><h3>🕯️ 54 birthday candles</h3><p>54 candles are hidden along the way. Some only appear when you get close, and some need a high jump or a Big Leap. Candles you've found stay found on this device. Find all 54 for a secret birthday surprise at the end!</p>
 <h3>Points</h3><table><tr><td>Jump an obstacle (land safely)</td><td>200–300</td></tr><tr><td>Candle</td><td>540</td></tr><tr><td>Gift</td><td>250</td></tr><tr><td>Free a friend</td><td>1,000</td></tr><tr><td>Bell-rope in the lab</td><td>500</td></tr><tr><td>Rescue Papa Smurf</td><td>10,000</td></tr></table>
 <p>Extra life every 20,000. After each rescue the journey repeats with more screens and faster critters. A loving remake of Coleco's 1982 <i>Smurf: Rescue in Gargamel's Castle</i>, made for Melissa's 54th birthday.</p>`;$('panel').style.display='flex';chrome()}
 $('pclose').onclick=e=>{e.stopPropagation();$('panel').style.display='none';panelOpen=false};
@@ -26,6 +26,7 @@ $('pclose').onclick=e=>{e.stopPropagation();$('panel').style.display='none';pane
 $('mute').onclick=e=>{e.stopPropagation();A();setMute(!muted);if(!muted&&!musicOn)playSong(curMusic())};
 $('pause').onclick=e=>{e.stopPropagation();A();togglePause()};
 $('help').onclick=e=>{e.stopPropagation();A();showHelp()};
+function songBanner(id){if(SONG_TITLES[id])setBanner('♪ '+SONG_TITLES[id],'#ff86a6')}
 function curMusic(){return state=='play'&&G?ZONES[G.zi].music:state=='parade'?'parade':state=='cake'?'bday':'title'}
 // ---------- input: on-screen buttons (multi-touch), play-area swipes, keyboard
 let held={l:0,r:0,d:0,j:0},keys={l:0,r:0,d:0,j:0},ptrs=new Map(),downBtn=null;
@@ -63,7 +64,7 @@ function runFX(){for(const a of FXQ){const k=a[0];
  else if(k=='splashfx'){for(let i=0;i<14;i++)part(a[1],GY+4,(Math.random()-.5)*80,-60-Math.random()*90,'#42ebf5',.8,2,300);SFX.splash()}
  else if(k=='candle'){const id=a[1];if(!foundEver.includes(id)){foundEver.push(id);ST.set('candles',foundEver);if(foundEver.length==TOTAL_CANDLES)setBanner('ALL 54 CANDLES! A birthday surprise awaits!','#ff86a6');else setBanner(`Birthday candle ${foundEver.length} of 54!`,'#ff86a6')}SFX.candle();for(let i=0;i<14;i++)part(a[2],a[3]-12,(Math.random()-.5)*80,(Math.random()-.9)*80,['#ffb020','#fff6a0','#ff86a6'][i%3],.7,2,90)}
  else if(k=='friend'){for(let i=0;i<20;i++)part(a[2],a[3]-20,(Math.random()-.5)*120,-Math.random()*120,['#5edc78','#ffd84a','#fff'][i%3],.9,2,160)}
- else if(k=='zone'){SFX.zone();setBanner(`${ZONES[a[1]].name}!  Energy refilled  (+${a[2]})`,'#5edc78');setBanner(ZONES[a[1]].taunt,'#c95bba');playSong(ZONES[a[1]].music)}
+ else if(k=='zone'){SFX.zone();setBanner(`${ZONES[a[1]].name}!  Energy refilled  (+${a[2]})`,'#5edc78');setBanner(ZONES[a[1]].taunt,'#c95bba');songBanner(ZONES[a[1]].music);playSong(ZONES[a[1]].music)}
  else if(k=='screen'){PARTS=[];POPS=POPS.filter(q=>q.t>9)}}FXQ=[]}
 // ---------- render + main loop (fixed 60 Hz game time; frozen while paused/backgrounded)
 function render(rdt){UIE=domRects();menuBtns=[];g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;g.fillStyle='#0d0a24';g.fillRect(0,0,c.width,c.height);g.setTransform(DPR,0,0,DPR,0,0);

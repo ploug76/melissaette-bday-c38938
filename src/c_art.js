@@ -66,7 +66,8 @@ function smurfRows(id,body,legs){const hd=SHAT.concat(HEAD.slice(6)).map(r=>r);c
  if(id=='clumsy'){set(10,7,'k');set(10,8,'k')}
  if(id=='papa'){rows[11]="kbbbeeeeeeeebbbk";rows[12]="kbbeeeekkeeeebbk";rows[13]="kbbbeeeeeeeebbbk";rows[14]="...kkeeeeeekk...";rows[15]="..kbbkeeeekbbk.."}
  return rows}
-function buildFolk(){for(const [id,pal] of Object.entries(FOLK)){const P2=Object.assign({},pal),o={};const male=id!='mel';
+function buildFolk(){{const o={},L={};for(const k in MELF){o[k]=mk(MELF[k],MELP);L[k]=flipC(o[k])}SPR.mel={r:o,l:L}}
+ for(const [id,pal] of Object.entries(FOLK)){if(id=='mel')continue;const P2=Object.assign({},pal),o={};const male=id!='mel';
   if(id=='papa'){P2.h='#e02a2a';P2.H='#a01818'}
   for(const [fr,lg] of Object.entries(LEGS)){const rows=male?smurfRows(id,fr=='jump'?SBODYJ:SBODY,lg):HEAD.concat(fr=='jump'?BODYJ:BODY,lg);o[fr]=mk(rows,P2)}
   // happy (eyes closed ^^) and hurt (x eyes) heads
@@ -75,7 +76,7 @@ function buildFolk(){for(const [id,pal] of Object.entries(FOLK)){const P2=Object
   const hu=HEAD.slice();hu[8]="kyybkbkbbkbkbyyk";hu[9]="kyybbkbbbbkbbyyk";hu[12]="kyyybbkwwkbbyyyk";o.hurt=mk(hu.concat(BODYJ,LEGS.jump),P2);
   const L={};for(const k in o)L[k]=flipC(o[k]);SPR[id]={r:o,l:L}}}
 // draw a folk sprite: anchor bottom-centre at (x,y). squash<1 = ducking
-function drawFolk(id,fr,x,y,face=1,squash=1,s=1){const sp=SPR[id][face>0?'r':'l'][fr]||SPR[id][face>0?'r':'l'].stand;const w=16*s,h=24*s*squash;g.drawImage(sp,Math.round(x-w/2),Math.round(y-h),w,h)}
+function drawFolk(id,fr,x,y,face=1,squash=1,s=1){const sp=SPR[id][face>0?'r':'l'][fr]||SPR[id][face>0?'r':'l'].stand;const k=sp.width>16?.75:1,w=sp.width*k*s,h=sp.height*k*s*squash;g.drawImage(sp,Math.round(x-w/2),Math.round(y-h),w,h)}
 // ---------- villains & critters (blocky rect pixel art, facing right; f=-1 mirrors)
 function mir(x,w,f,ox){return f>0?x:2*ox-x-w}
 function wizard(x,y,f=1,t=0,pose=''){ // Gargamel: bald, scraggly, black patched robe, black robe; anchor bottom centre

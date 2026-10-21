@@ -3,15 +3,15 @@
 # Shared tools are only IMPORTED (in-memory cfg); no shared file is modified.
 set -e
 D=/workspace/melissaette-bday-c38938
-cd $D/src && cat a_head.html b_core.js c_art.js d_levels.js e_game.js f_render.js g_ui.js h_main.js i_bot.js > ../index.html && echo '</script></body></html>' >> ../index.html
+cd $D/src && cat a_head.html b_core.js b2_songs.js c_art.js c1_mel.js c2_portrait.js d_levels.js e_game.js f_render.js g_ui.js h_main.js i_bot.js > ../index.html && echo '</script></body></html>' >> ../index.html
 if [ "$1" != "nometa" ]; then
 python3 - <<'PY'
 import sys,html,re
 sys.path.insert(0,'/workspace/launch')
 import share
-REPO='melissaette-bday-c38938';URL=f'https://ploug76.github.io/{REPO}/';IMG=URL+'cover.png'
+REPO='melissaette-bday-c38938';URL=f'https://ploug76.github.io/{REPO}/';IMG=URL+'cover.png?v=3'
 T="Melissaette: Rescue in Gargamel's Castle"
-DESC="Happy 54th Birthday, Melissa! 🎂 A birthday game made just for you: guide Melissaette past Gargamel and Azrael to rescue her Smurf friends, and find all 54 hidden candles."
+DESC="Happy 54th Birthday, Melissa! 🎂 A birthday game made just for you: guide Melissaette past Gargamel and Azrael to rescue her Smurf friends to an 8-bit 80s movie soundtrack, and find all 54 hidden candles."
 e=lambda s:html.escape(s,quote=True)
 tags=(f'<!--og--><meta name="robots" content="noindex,nofollow"><meta name="description" content="{e(DESC)}">'
  f'<meta property="og:type" content="website"><meta property="og:site_name" content="{e(T)}"><meta property="og:title" content="{e(T)}">'
