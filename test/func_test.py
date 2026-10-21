@@ -11,7 +11,7 @@ async def main():
     await pg.evaluate("()=>__T.start(2)");await pg.wait_for_timeout(400)
     await pg.evaluate("()=>window.dispatchEvent(new Event('blur'))");await pg.wait_for_timeout(200);ap=await pg.evaluate("()=>paused")
     await pg.evaluate("()=>__T.togglePause()");up=await pg.evaluate("()=>paused")
-    await pg.evaluate("()=>{window.__manual=1;__T.goScreen(9);__T.setHeld({r:1});__T.step(75);__T.setHeld({})}");await pg.screenshot(path='../gameplay.png')
+    await pg.evaluate("()=>{window.__manual=1;__T.goScreen(9);__T.setHeld({r:1});__T.step(75);__T.setHeld({})}");await pg.screenshot(path='func_shot.png')
     caches=await pg.evaluate("async()=>(await caches.keys())")
     await ctx.set_offline(True);await pg.reload();await pg.wait_for_timeout(1200);off=await pg.evaluate("()=>typeof __T==='object'&&state")
     img=await pg.evaluate("()=>TITLE_IMG.complete&&TITLE_IMG.naturalWidth")
