@@ -1,8 +1,9 @@
 # Melissaette 24x32 sprite generator (source of truth; exported into src/c_art.js as pixel strings).
 # Painted in layers with region ids, then auto-outlined (outer + selected inner seams), like hand pixel art.
 W,H=24,32
-PAL={'k':'#1a1238','h':'#ffffff','H':'#cfd7f0','y':'#ffd23a','Y':'#e3992a','l':'#fff4b0','b':'#5aa2ff','d':'#3270d8','B':'#86bcff',
-     'w':'#ffffff','g':'#cfd7f0','e':'#ffffff','p':'#1a1238','i':'#4a8ae8','c':'#ff92b4','m':'#e0405a','s':'#ffffff','S':'#aeb9dc'}
+PAL={'k':'#1a1238','h':'#d8d8e8','H':'#d8d8e8','y':'#a8532a','Y':'#6e2e16','l':'#d98a4e','b':'#5aa2ff','d':'#3270d8','B':'#86bcff',
+     'w':'#fbd6e0','g':'#e9a9bd','e':'#ffffff','p':'#1a1238','i':'#5d7fae','c':'#ff92b4','m':'#a3122c','s':'#c8304a','S':'#8a1c30',
+     'f':'#e0405e','v':'#9a8ad8','o':'#f2c230','n':'#1a1a22'}
 def new():return [['.' ]*W for _ in range(H)],[[None]*W for _ in range(H)]
 def put(G,x,y,ch,reg):
   px,rg=G
@@ -47,10 +48,12 @@ def build(legs='stand',arms='down',mood='norm',bob=0,hairsway=0):
     rect(G,6,19,7,22,'b','arm');put(G,5,23,'b','arm');put(G,6,23,'b','arm');rect(G,17,19,18,22,'b','arm');put(G,18,23,'b','arm');put(G,19,23,'b','arm')
   rows(G,{18:(9,15),19:(8,16),20:(8,16),21:(9,15)},'dress','w')
   rect(G,7,18,8,19,'w','dress');rect(G,16,18,17,19,'w','dress')   # puff sleeves
-  rows(G,{22:(10,14)},'dress','g')                                   # cinched waist
+  rows(G,{22:(10,14)},'dress','n');put(G,12,22,'o','dress')          # black belt, gold buckle
   rows(G,{23:(9,15),24:(8,16),25:(8,17),26:(7,17),27:(7,18)},'dress','w')
   rows(G,{27:(7,18)},'dress','g')
   for x in(9,12,15):put(G,x,25,'g','dress')                          # skirt folds
+  for (x,y,c) in((10,20,'f'),(14,19,'v'),(12,21,'f'),(10,24,'v'),(13,24,'f'),(16,26,'f'),(8,26,'f'),(11,26,'v'),(14,26,'v')):put(G,x,y,c,'dress')
+  put(G,10,18,'k','dress');put(G,14,18,'k','dress');put(G,12,19,'h','dress')   # bead necklace + pendant
   # legs + white heels
   L={'stand':[(10,14)],'w1':[(9,15)],'w2':[(11,13)],'jump':[(10,14)]}[legs]
   for (a,b) in L:
@@ -63,24 +66,22 @@ def build(legs='stand',arms='down',mood='norm',bob=0,hairsway=0):
   # face
   ell(G,12.5,12.6,6.6,5.6,'b','face')
   rect(G,11,17,13,17,'b','face')
-  # bangs (fringe) under the hat
-  rows(G,{7:(5,19),8:(5,9)},'hair','y');rows(G,{8:(15,19)},'hair','y');put(G,6,9,'y','hair');put(G,18,9,'y','hair');put(G,10,8,'y','hair');put(G,14,8,'y','hair')
-  put(G,7,8,'l','hair');put(G,17,8,'l','hair')
-  # hat: floppy Smurf cap (rounded crown, soft tip flopping back over the left, fold shading)
-  ell(G,12.5,5.0,7.6,5.0,'h','hat',cond=lambda x,y:y<=7)
-  rows(G,{7:(5,20),8:(6,19)},'hat','h')
-  for x in range(5,21):put(G,x,7,'H' if x in(5,6,19,20) else 'h','hat')
-  for x in range(6,20):put(G,x,8,'H','hat')
-  ell(G,4.6,5.4,3.4,2.2,'h','tip');put(G,2,6,'H','tip');put(G,3,6,'H','tip');put(G,2,5,'H','tip')
-  for (x,y) in((8,2),(9,2),(10,1)):put(G,x,y,'H','hat')
+  # Melissa: big curly auburn crown (80s volume) + side-swept fringe (no hat)
+  ell(G,12.5,6.2,9.2,5.9,'y','hair',cond=lambda x,y:y<=6)
+  for (x,y) in((7,0),(8,0),(11,0),(12,0),(16,0),(17,0)):put(G,x,y,'y','hair')
+  rows(G,{7:(5,19),8:(5,9)},'hair','y');rows(G,{8:(15,19)},'hair','y');put(G,10,8,'Y','hair');put(G,6,9,'y','hair');put(G,5,9,'y','hair');put(G,18,9,'y','hair');put(G,19,9,'y','hair');
+  for (x,y) in((6,3),(9,2),(13,2),(16,3),(18,5),(5,6),(10,5),(14,4),(8,7),(15,7),(12,7),(19,8)):put(G,x,y,'Y','hair')
+  for (x,y) in((8,2),(12,1),(15,2),(7,4),(11,4),(17,5),(13,6),(6,7),(17,7)):put(G,x,y,'l','hair')
+  # gold hoop earrings peeking out of the curls
+  for ex in(6,18):put(G,ex,16,'o','ear');put(G,ex,17,'o','ear')
   # eyes (big, with lashes)
   px,rg=G
   for ex in(8,14):
     for y in range(10,14):
       for x in range(ex,ex+3):put(G,x,y,'e','face')
     put(G,ex+1,12,'i','face');put(G,ex+2,12,'p','face');put(G,ex+1,13,'p','face');put(G,ex+2,13,'p','face')
-    for x in range(ex,ex+3):put(G,x,9,'k','face')
-  put(G,7,9,'k','face');put(G,17,9,'k','face');put(G,7,10,'k','face');put(G,17,10,'k','face')  # lash flicks
+    for x in range(ex,ex+3):put(G,x,9,'Y','face');put(G,x,10,'k','face')   # auburn brows + confident upper lids
+  put(G,7,10,'k','face');put(G,17,10,'k','face');put(G,7,11,'k','face');put(G,17,11,'k','face')  # lash flicks
   if mood=='happy':
     for ex in(8,14):
       for y in range(9,14):
@@ -96,7 +97,7 @@ def build(legs='stand',arms='down',mood='norm',bob=0,hairsway=0):
   put(G,7,14,'c','face');put(G,17,14,'c','face')
   if mood=='hurt':rect(G,11,16,13,16,'k','face')
   elif mood=='happy':put(G,10,15,'k','face');rect(G,11,16,13,16,'m','face');put(G,14,15,'k','face');rect(G,11,17,13,17,'k','face')
-  else:put(G,10,15,'k','face');rect(G,11,16,13,16,'k','face');put(G,14,15,'k','face');put(G,12,15,'b','face')
+  else:put(G,11,15,'m','face');put(G,13,15,'m','face');rect(G,11,16,13,16,'m','face');put(G,10,15,'k','face');put(G,14,15,'k','face')
   out=outline(G)
   # bob (shift down) for walk frames
   if bob:out=[['.']*W]*bob+out[:-bob]

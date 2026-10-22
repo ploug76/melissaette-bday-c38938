@@ -9,7 +9,21 @@ def text(d,x,y,s,col,sc,shadow=None):
   finally:gen.F=old
 def tw(s,sc):return sum((len(F2[c][0])+1)*sc for c in s)-sc
 W,H=1200,630
-ART=Image.open('/workspace/melissaette-bday-c38938/art/ref_clean_full.png').convert('RGB')
+# left panel: drawn close-up of Melissaette (no third-party box art or logos)
+_P=Image.open('/workspace/melissaette-bday-c38938/art/mel_portrait.png').convert('RGBA');_bb=_P.getbbox()
+BUST=_P.crop((_bb[0]-6,_bb[1]-6,_bb[2]+6,_bb[1]+int((_bb[3]-_bb[1])*.62)))
+def left_panel(side,t):
+  im=Image.new('RGB',(side,side),'#1b1440');d=ImageDraw.Draw(im)
+  for y in range(side):d.line([(0,y),(side,y)],fill=(27+y*30//side,20+y*12//side,64+y*70//side))
+  for i in range(46):x=(i*89)%side;y=(i*47)%(side*2//3);R(d,x,y,4,4,'#ffffff' if (i+t)%6 else '#ffd84a')
+  for (x,h) in ((-20,190),(60,150),(400,170),(470,210)):d.polygon([(x,side-60),(x+50,side-60-h),(x+100,side-60)],fill='#123a2a')
+  R(d,0,side-64,side,64,'#21b03b');R(d,0,side-64,side,6,'#5edc78')
+  for i in range(7):
+    x=40+i*72;c=['#ff86a6','#42ebf5','#ffd84a','#5edc78','#c95bba','#ff86a6','#42ebf5'][i];R(d,x,side-104,12,40,c);f=(t+i)%2;d.ellipse([x,side-126-f*3,x+12,side-104],fill='#ffb020')
+  bh=int(side*.84);bw=int(BUST.width*bh/BUST.height)
+  if bw>side-20:bw=side-20;bh=int(BUST.height*bw/BUST.width)
+  b=BUST.resize((bw,bh),Image.LANCZOS);im.paste(b,((side-bw)//2,side-bh),b)
+  return im
 def R(d,x,y,w,h,c):d.rectangle([x,y,x+w-1,y+h-1],fill=c)
 def castle(d,x,y,s,c='#5a4a8a',win='#ffd84a'):
   R(d,x,y-40*s,70*s,40*s,c)
@@ -37,9 +51,9 @@ def frame(t=0):
   cols=['#d4524d','#ffb020','#ffd84a','#21c842','#42ebf5','#5455ed','#c95bba']
   for i,c in enumerate(cols):R(d,0,i*6,W,6,c);R(d,0,H-42+i*6,W,6,c)
   side=528;ax,ay=36,52;R(d,ax-8,ay-8,side+16,side+16,'#ffffff');R(d,ax-4,ay-4,side+8,side+8,'#d4524d')
-  im.paste(ART.resize((side,side),Image.LANCZOS),(ax,ay))
+  im.paste(left_panel(side,max(t,0)),(ax,ay))
   tl='MELISSAETTE';sc=8;text(d,px+(PW-tw(tl,sc))//2,76,tl,'#ffd84a',sc,shadow='#c95bba')
-  t2="RESCUE IN GARGAMEL'S CASTLE";sc2=3;text(d,px+(PW-tw(t2,sc2))//2,150,t2,'#ffffff',sc2,shadow='#5455ed')
+  t2="A BIRTHDAY ADVENTURE";sc2=3;text(d,px+(PW-tw(t2,sc2))//2,150,t2,'#ffffff',sc2,shadow='#5455ed')
   # birthday banner ribbon across the bottom
   b='HAPPY 54TH BIRTHDAY, MELISSA!';sb=5;bw=tw(b,sb)+48;bx=(W-bw)//2;by=516
   R(d,bx-34,by+14,44,44,'#a0284a');R(d,bx+bw-10,by+14,44,44,'#a0284a')

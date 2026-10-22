@@ -9,7 +9,7 @@ python3 - <<'PY'
 import sys,html,re
 sys.path.insert(0,'/workspace/launch')
 import share
-REPO='melissaette-bday-c38938';URL=f'https://ploug76.github.io/{REPO}/';IMG=URL+'cover.png?v=3'
+REPO='melissaette-bday-c38938';URL=f'https://ploug76.github.io/{REPO}/';IMG=URL+'cover.png?v=4'
 T="Melissaette: Rescue in Gargamel's Castle"
 DESC="Happy 54th Birthday, Melissa! 🎂 A birthday game made just for you: guide Melissaette past Gargamel and Azrael to rescue her Smurf friends to an 8-bit 80s movie soundtrack, and find all 54 hidden candles."
 e=lambda s:html.escape(s,quote=True)
