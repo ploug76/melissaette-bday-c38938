@@ -1,6 +1,6 @@
 // ---------- skills (like the original's 4 skill options) & game state
 const SK=[null,{n:'STROLL',d:'No critters, no energy limit',crit:0,vill:0,drain:0,spd:.85},{n:'ADVENTURE',d:'Critters, villains & energy meter',crit:1,vill:1,drain:1.2,spd:1},{n:'BRAVE',d:'Faster critters, quicker drain',crit:1,vill:1,drain:1.65,spd:1.18},{n:'DARING',d:'Fastest of all!',crit:1,vill:1,drain:2.15,spd:1.35}];
-const V0=252,GH=620,GF=1500,RUN=80;
+const V0=252,GH=620,GF=1500,RUN=80,RUN_B=112;// RUN_B: holding B (run) on the retro pad
 let G=null,FXQ=[];
 function fx(...a){if(!SIM)FXQ.push(a)}
 function spd(G){return SK[G.skill].spd*(1+.12*(G.round-1))*(G.pw.slow>0?.5:1)}
@@ -52,9 +52,9 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
  p.duck=canMove&&IN.d&&p.on;p.h=p.duck?12:20;
  let dir=canMove&&!p.duck?(IN.r?1:0)-(IN.l?1:0):0;
  const under=p.on&&p.gi>=0?G.sol[p.gi]:null;const slip=under&&G.puddles.some(q=>Math.abs(q.y-under.y)<1&&Math.abs(p.x-q.x)<q.w/2+2);p.slip=slip;
- const maxv=p.big?122:RUN,acc=p.on?(slip?210:950):560,dec=p.on?(slip?150:1500):0;
+ const runv=IN.b?RUN_B:RUN,maxv=p.big?122:runv,acc=p.on?(slip?210:950):560,dec=p.on?(slip?150:1500):0;
  if(dir){p.vx+=CL(dir*maxv-p.vx,-acc*DT,acc*DT);p.face=dir}else if(dec){const s=Math.sign(p.vx);p.vx-=s*Math.min(Math.abs(p.vx),dec*DT)}
- if(!p.big&&p.on&&Math.abs(p.vx)>RUN)p.vx=Math.sign(p.vx)*RUN;
+ if(!p.big&&p.on&&Math.abs(p.vx)>runv)p.vx=Math.sign(p.vx)*runv;
  // jump: buffer + coyote time + variable height; a quick second tap in the air = Big Leap (the original's "push up again immediately")
  if(jp&&canMove)p.buf=.13;if(p.on)p.coy=.1;else p.coy-=DT;p.buf-=DT;
  const spring=G.pw.spring>0;
@@ -68,7 +68,7 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
  // horizontal move + collide
  p.x+=p.vx*DT;let s=solidHit(G,p.x-4,p.y-p.h,8,p.h-.5);if(s){if(p.x<s.x+s.w/2)p.x=s.x-4.01;else p.x=s.x+s.w+4.01;p.vx=0}
  // vertical
- const oy=p.y;p.y+=p.vy*DT;const wasOn=p.on;p.on=false;let landS=-1;
+ const oy=p.y;p.oy=oy;p.ovy=p.vy;p.jl=0;p.y+=p.vy*DT;const wasOn=p.on;p.on=false;let landS=-1;
  for(let i=0;i<G.sol.length;i++){const q=G.sol[i];if(q.k=='trap'&&q.open)continue;if(q.k=='plank'&&q.fall)continue;
   if(p.x+4<=q.x||p.x-4>=q.x+q.w)continue;
   if(p.vy>=0&&oy<=q.y+.01&&p.y>=q.y){if(landS<0||q.y<G.sol[landS].y)landS=i;continue}
@@ -77,7 +77,7 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
  else p.gi=-1;
  if(!p.on)p.air+=DT;else{p.air=0;if(Math.abs(p.vx)>5)p.walkT+=DT}
  if(p.on&&p.gi>=0&&G.sol[p.gi].k=='plank'&&G.sol[p.gi].ct<0){G.sol[p.gi].ct=0;fx('sfx','crumble')}}
-function land(G,p){p.jumping=false;p.big=false;p.bigUsed=true;fx('sfx','land');fx('dust',p.x,p.y);
+function land(G,p){p.jl=1;p.jumping=false;p.big=false;p.bigUsed=true;fx('sfx','land');fx('dust',p.x,p.y);
  if(p.x>p.jx+6){let pts=0;for(const o of G.obs){if(!o.done&&o.x>=p.jx-4&&o.x+o.w<=p.x+4){o.done=1;pts+=o.pts}}if(pts)addScore(G,pts,p.x,p.y-26)}}
 function addScore(G,n,x,y,col){G.score+=n;if(x!=null)fx('pop','+'+n,x,y,col||'#ffd84a');if(G.score>=G.nextLife){G.nextLife+=20000;G.lives=Math.min(9,G.lives+1);fx('sfx','oneup');fx('banner','Extra life!','#5edc78')}}
 // ---------- hurt / death
@@ -114,7 +114,7 @@ function step(G,IN){G.gt+=DT;const p=G.p;
  // entities
  const pb=pbox(p),hit=(x,y,w,h)=>p.inv<=0&&ovl(pb,{x,y,w,h});
  // creatures: land on top while falling = stomp (creature knocked out, small bounce, no harm); any other touch still hurts
- const stomp=(e,x,y,w,h)=>{if(!ovl(pb,{x,y,w,h}))return false;if(!(p.vy>0&&!p.on&&p.y<=y+h/2+4))return false;
+ const stomp=(e,x,y,w,h)=>{if(!ovl(pb,{x,y,w,h}))return false;if(!((p.vy>0&&!p.on&&p.y<=y+h/2+4)||(p.jl&&p.ovy>0&&p.oy<=y+h/2+4)))return false;// also counts the frame she touches down on a low creature (snakes are only 5px tall)
   e.dead=1;p.vy=-200;p.on=false;p.jumping=true;p.cut=true;p.bigUsed=true;p.big=false;fx('sfx','stomp');fx('poof',e.x,e.y);return true},
   crit=(e,x,y,w,h,why)=>{if(stomp(e,x,y,w,h))return;if(hit(x,y,w,h))hurt(G,why)};
  for(const e of G.ents){switch(e.k){

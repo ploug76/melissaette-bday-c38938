@@ -14,20 +14,28 @@ function readSafe(){try{if(window.__SAFE){SAFE=Object.assign({t:0,r:0,b:0,l:0},w
 function onResize(){readSafe();VW=innerWidth;VH=innerHeight;DPR=Math.min(devicePixelRatio||1,3);c.width=Math.round(VW*DPR);c.height=Math.round(VH*DPR);LY=computeLayout();[['pause',6],['mute',54],['help',102]].forEach(([id,r])=>{const e=$(id);e.style.top=(SAFE.t+6)+'px';e.style.right=(SAFE.r+r)+'px'})}
 function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T=SAFE.t,B=VH-SAFE.b,aw=R-L,ah=B-T;const portrait=ah>=aw*1.12;const o={L,R,T,B,aw,ah,portrait};
  o.dom={x:R-150,y:T+6,w:144,h:42};
+ // retro 8-bit controller: cross D-pad (arm = a px, >=56) + round B/A buttons (radius br)
  if(portrait){o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42},{x:L+8,y:T+52,w:aw-16,h:30}];
-  const top=T+88,ctrlMin=Math.min(200,Math.max(130,ah*.24));let fw=Math.min(aw,(ah-88-30-ctrlMin)*4/3);fw=Math.max(160,fw);const fh=fw*.75;
+  const a=CL(Math.floor(Math.min(aw/7,ah*.09)),56,72),br=CL(Math.round(a*.6),33,42),ph=3*a+58;
+  let fw=Math.min(aw,(ah-88-30-ph-10)*4/3);fw=Math.max(160,fw);const fh=fw*.75;const spare=Math.max(0,ah-88-fh-28-8-ph-6),top=T+88+Math.round(spare*.45);
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:L+8,y:top+fh+4,w:aw-16,h:24};
-  const cy0=o.lane.y+o.lane.h+8,cy1=B-8,ch=cy1-cy0;const bs=Math.max(54,Math.min(92,ch*.62,aw/4.7));const cy=cy0+ch/2;
-  o.btn={l:{x:L+12,y:cy-bs/2+bs*.18,w:bs,h:bs},r:{x:L+12+bs+12,y:cy-bs/2+bs*.18,w:bs,h:bs},d:{x:R-12-bs*1.15-12-bs*.85,y:cy-bs/2+bs*.4,w:bs*.85,h:bs*.85},j:{x:R-12-bs*1.15,y:cy-bs/2-bs*.12,w:bs*1.15,h:bs*1.15}};
-  o.ctrlArea={x:L,y:cy0,w:aw,h:ch}}
- else{o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42}];const top=T+54;let fh=ah-54-32,fw=fh*4/3;if((aw-fw)/2<112){fw=aw-224;fh=fw*.75}if(fh>ah-54-32){fh=ah-86;fw=fh*4/3}
+  const py=Math.max(o.lane.y+o.lane.h+8,B-6-ph);o.panel=[{x:L+6,y:py,w:aw-12,h:B-6-py}];
+  const cy=py+14+1.5*a+6;o.pad={cx:L+6+14+1.5*a,cy,a};
+  const ax=R-6-16-br,bx=ax-2*br-Math.max(12,Math.min(26,(ax-br-(o.pad.cx+1.5*a))-2*br-14));
+  o.ab={b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy-br*.35,r:br}};
+  o.ctrlArea={x:L,y:py,w:aw,h:B-py}}
+ else{o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42}];const top=T+54;const a=CL(Math.floor(ah*.15),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
+  let fh=ah-54-32,fw=fh*4/3;if((aw-fw)/2<side){fw=aw-2*side;fh=fw*.75}if(fh>ah-54-32){fh=ah-86;fw=fh*4/3}
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:o.field.x,y:top+fh+4,w:fw,h:24};
-  const sw=o.field.x-L-12,bs=Math.max(48,Math.min(84,sw*.46,ah*.22));const by=Math.min(B-12-bs,o.field.y+fh-bs);
-  const gp=Math.min(14,Math.max(6,sw-2*bs-8));o.btn={l:{x:L+8,y:by,w:bs,h:bs},r:{x:L+8+bs+gp,y:by,w:bs,h:bs},j:{x:R-8-bs*1.1,y:by-bs*.1,w:bs*1.1,h:bs*1.1},d:{x:R-8-bs*1.1-gp-bs*.85,y:by+bs*.15,w:bs*.85,h:bs*.85}};
-  if(o.btn.r.x+bs>o.field.x-8){o.btn.r.x=L+8;o.btn.r.y=by-bs-10}
-  if(o.btn.d.x<o.field.x+o.field.w+8){o.btn.d.x=R-8-bs*.85;o.btn.d.y=o.btn.j.y-bs*.85-10}
-  o.side=[{x:L+8,y:top,w:o.field.x-L-16,h:Math.max(0,Math.min(o.btn.l.y,o.btn.r.y)-top-10)},{x:o.field.x+fw+8,y:top,w:R-(o.field.x+fw)-16,h:Math.max(0,Math.min(o.btn.j.y,o.btn.d.y)-top-10)}];
+  const sw=o.field.x-L,cy=B-10-1.5*a;o.pad={cx:L+sw/2,cy,a};
+  const rx0=o.field.x+fw,rsw=R-rx0,acx=rx0+rsw/2+br+6,bcy=B-44-br;
+  o.ab={b:{cx:rx0+rsw/2-br-6,cy:bcy,r:br},a:{cx:acx,cy:bcy-br*.7,r:br}};
+  o.panel=[{x:L+4,y:cy-1.5*a-10,w:sw-8,h:B-4-(cy-1.5*a-10)},{x:rx0+4,y:o.ab.a.cy-br-12,w:rsw-8,h:B-4-(o.ab.a.cy-br-12)}];
+  o.side=[{x:L+8,y:top,w:sw-16,h:Math.max(0,o.panel[0].y-top-8)},{x:rx0+8,y:top,w:rsw-16,h:Math.max(0,o.panel[1].y-top-8)}];
   o.ctrlArea=null}
+ // bounding boxes (used by scene buttons / overlap tests); j = A button
+ const bb=q=>({x:q.cx-q.r,y:q.cy-q.r,w:2*q.r,h:2*q.r});const P=o.pad;
+ o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-1.5*P.a,w:3*P.a,h:3*P.a},b:bb(o.ab.b),j:bb(o.ab.a)};
  o.ws=o.field.w/FW;return o}
 addEventListener('resize',onResize);
 const ovl=(a,b,p=0)=>a.x<b.x+b.w+p&&b.x<a.x+a.w+p&&a.y<b.y+b.h+p&&b.y<a.y+a.h+p;

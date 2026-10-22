@@ -14,8 +14,7 @@ function togglePause(){if(state!='play')return;paused=!paused;held={l:0,r:0,d:0,
 function chrome(){$('pause').style.display=state=='play'?'block':'none';$('mute').style.display='block';$('help').style.display=state=='title'||state=='play'?'block':'none';$('pause').textContent=paused?'▶':'⏸';$('pause').setAttribute('aria-label',paused?'Resume':'Pause');try{if(window.__dock)__dock.tick()}catch(e){}}
 function showHelp(){if(state=='play'&&!paused)togglePause();panelOpen=true;$('ptext').innerHTML=`<h2>👒 Melissaette: Rescue in Gargamel's Castle</h2>
 <p>The wicked wizard <b>Gargamel</b> and his cat <b>Azrael</b> have carried off Melissaette's Smurf friends! Walk right, screen by screen, through the village, fields, hills, river, woods and cavern to the castle, and set everyone free.</p>
-<h3>Controls</h3><ul><li><b>◀ ▶</b> walk, <b>▼</b> duck (under low bats, hawks and spiders).</li><li><b>JUMP</b>: tap for a hop, <b>hold for a higher jump</b>.</li><li><b>Big Leap</b>: tap JUMP again <i>right away</i> while rising, just like the 1982 classic.</li><li>Or touch the play area: swipe up to jump, swipe down to duck, drag sideways to walk, tap to hop.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, P pause, M mute.</li></ul>
-<h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
+<h3>Controls</h3><ul><li><b>D-pad</b> (bottom left): <b>◀ ▶</b> walk, <b>▲</b> jump, <b>▼</b> duck (under low bats, hawks and spiders). Slide your thumb to change direction; corners press two directions.</li><li><b>A</b>: jump. Tap for a hop, <b>hold for a higher jump</b>.</li><li><b>B</b>: hold to <b>run</b> faster (hold B + ▶, then A for a long jump).</li><li><b>Big Leap</b>: tap A again <i>right away</i> while rising, just like the 1982 classic.</li><li>Or touch the play area: swipe up to jump, swipe down to duck, drag sideways to walk, tap to hop.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, Shift or X to run, P pause, M mute.</li></ul><h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
 <h3>Energy</h3><p>Her energy drains as she walks and refills only when she reaches a <b>new land</b>. Leftover energy is bonus points!</p>
 <h3>Gifts</h3><ul><li>🫧 Bubble shield: saves you from one oops.</li><li>👟 Spring shoes: higher jumps for 20 s.</li><li>🐌 Snail-time: slows critters and villains.</li><li>🧁 Cupcake: +50 energy.</li></ul>
 <h3>🎵 Soundtrack</h3><p>Every land plays its own 8-bit 80s movie hit: Pretty in Pink, Don't You (Forget About Me), Footloose, Girls Just Want to Have Fun, The Power of Love, Take My Breath Away, Ghostbusters and Danger Zone, with The Time of My Life on the title and parade.</p><h3>🕯️ 54 birthday candles</h3><p>54 candles are hidden along the way. Some only appear when you get close, and some need a high jump or a Big Leap. Candles you've found stay found on this device. Find all 54 for a secret birthday surprise at the end!</p>
@@ -28,30 +27,50 @@ $('pause').onclick=e=>{e.stopPropagation();A();togglePause()};
 $('help').onclick=e=>{e.stopPropagation();A();showHelp()};
 function songBanner(id){if(SONG_TITLES[id])setBanner('♪ '+SONG_TITLES[id],'#ff86a6')}
 function curMusic(){return state=='play'&&G?ZONES[G.zi].music:state=='parade'?'parade':state=='cake'?'bday':'title'}
-// ---------- input: on-screen buttons (multi-touch), play-area swipes, keyboard
-let held={l:0,r:0,d:0,j:0},keys={l:0,r:0,d:0,j:0},ptrs=new Map(),downBtn=null;
+// ---------- input: retro controller (D-pad + B/A, multi-touch), play-area swipes, keyboard
+let held={l:0,r:0,d:0,j:0,b:0},keys={l:0,r:0,d:0,j:0,b:0},ptrs=new Map(),downBtn=null,padHeld={u:0,a:0};
 const inR=(b,x,y,p=0)=>x>=b.x-p&&x<=b.x+b.w+p&&y>=b.y-p&&y<=b.y+b.h+p;
-function btnAt(x,y){let best=null,bd=1e9;for(const k of ['l','r','d','j']){const b=LY.btn[k];if(inR(b,x,y,10)){const d=Math.hypot(x-(b.x+b.w/2),y-(b.y+b.h/2));if(d<bd){bd=d;best=k}}}return best}
-function recompute(){const h={l:0,r:0,d:0,j:0};for(const q of ptrs.values()){if(q.b)h[q.b]=1;if(q.sw)for(const k of q.sw)h[k]=1}for(const k in h)h[k]=h[k]||keys[k];held=h}
+// D-pad: direction from the pad centre (8-way: diagonals press both), works even if the thumb slides off the pad
+function padDirs(x,y){const P=LY.pad,dx=x-P.cx,dy=y-P.cy,ax=Math.abs(dx),ay=Math.abs(dy),o=[];if(Math.hypot(dx,dy)<P.a*.32)return o;
+ const T=2.414;if(ax>ay/T)o.push(dx>0?'r':'l');if(ay>ax/T)o.push(dy>0?'d':'u');return o}
+function onPad(x,y){const P=LY.pad,h=P.a*1.5+14;return Math.abs(x-P.cx)<=h&&Math.abs(y-P.cy)<=h}
+// B/A: every button whose (padded) circle holds the point, so a thumb between them presses both
+function abAt(x,y,pad=12){const o=[];for(const k of ['b','a']){const q=LY.ab[k];if(Math.hypot(x-q.cx,y-q.cy)<=q.r+pad)o.push(k)}return o}
+function inPanel(x,y){return LY.panel.some(p=>inR(p,x,y,0))}
+function recompute(){const h={l:0,r:0,d:0,j:0,b:0},ph={u:0,a:0};for(const q of ptrs.values()){
+  if(q.pad)for(const k of q.pad){if(k=='u'){h.j=1;ph.u=1}else h[k]=1}
+  if(q.ab)for(const k of q.ab){if(k=='a'){h.j=1;ph.a=1}else h.b=1}
+  if(q.sw)for(const k of q.sw)h[k]=1}
+ for(const k in h)h[k]=h[k]||keys[k];
+ for(const k of ['l','r','d','j','b'])if(h[k]&&!held[k])vib(10);held=h;padHeld=ph}
+function resetInput(){ptrs.clear();keys={l:0,r:0,d:0,j:0,b:0};recompute()}
 c.addEventListener('pointerdown',e=>{e.preventDefault();A();if(!musicOn)playSong(curMusic());const x=e.clientX,y=e.clientY;
  if(state!='play'||paused){downBtn=menuBtns.find(b=>inR(b,x,y,4))||null;return}
- const b=btnAt(x,y);if(b){ptrs.set(e.pointerId,{b});recompute();return}
+ try{c.setPointerCapture(e.pointerId)}catch(_){}
+ if(onPad(x,y)){ptrs.set(e.pointerId,{pad:padDirs(x,y)});recompute();return}
+ const ab=abAt(x,y);if(ab.length){ptrs.set(e.pointerId,{ab});recompute();return}
+ if(inPanel(x,y)){ptrs.set(e.pointerId,{dead:1});return}
  ptrs.set(e.pointerId,{x0:x,y0:y,t0:performance.now(),sw:[],moved:false});recompute()},{passive:false});
-c.addEventListener('pointermove',e=>{const q=ptrs.get(e.pointerId);if(!q)return;const x=e.clientX,y=e.clientY;
- if(q.b){const b=btnAt(x,y);if(b&&b!=q.b&&!(q.b=='j'||b=='j')){q.b=b;recompute()}return}
+c.addEventListener('pointermove',e=>{const q=ptrs.get(e.pointerId);if(!q||q.dead)return;const x=e.clientX,y=e.clientY;
+ if(q.pad){const d=padDirs(x,y);if(d.join()!=q.pad.join()){q.pad=d;recompute()}return}
+ if(q.ab){const b=abAt(x,y,16);if(b.length&&b.join()!=q.ab.join()){q.ab=b;recompute()}return}
  const dx=x-q.x0,dy=y-q.y0,th=16;const sw=[];if(dy<-th&&Math.abs(dy)>Math.abs(dx)*.6)sw.push('j');else if(dy>th&&Math.abs(dy)>Math.abs(dx))sw.push('d');if(Math.abs(dx)>th&&Math.abs(dx)>Math.abs(dy)*.6)sw.push(dx>0?'r':'l');
  if(sw.length)q.moved=true;q.sw=sw;recompute()});
+// no stuck inputs, no scrolling/zooming/long-press menus on the controller
+c.addEventListener('contextmenu',e=>e.preventDefault());
+['touchstart','touchmove'].forEach(ev=>c.addEventListener(ev,e=>{if(e.cancelable)e.preventDefault()},{passive:false}));
+['touchend','touchcancel'].forEach(ev=>c.addEventListener(ev,e=>{if(e.cancelable)e.preventDefault();if(ev=='touchcancel'||!e.touches.length){ptrs.clear();recompute()}},{passive:false}));
 let tapJump=0;
-function ptrEnd(e){const q=ptrs.get(e.pointerId);if(q){ptrs.delete(e.pointerId);if(!q.b&&!q.moved&&performance.now()-q.t0<300&&e.type=='pointerup')tapJump=8;recompute()}
+function ptrEnd(e){const q=ptrs.get(e.pointerId);if(q){ptrs.delete(e.pointerId);if(!q.pad&&!q.ab&&!q.dead&&!q.moved&&performance.now()-q.t0<300&&e.type=='pointerup')tapJump=8;recompute()}
  if(downBtn&&e.type=='pointerup'){const x=e.clientX,y=e.clientY;const b=menuBtns.find(b=>inR(b,x,y,6));if(b&&b.x==downBtn.x&&b.y==downBtn.y){SFX.click();b.fn()}}downBtn=null}
-c.addEventListener('pointerup',ptrEnd);c.addEventListener('pointercancel',ptrEnd);
-const KM={ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r',ArrowDown:'d',s:'d',S:'d',ArrowUp:'j',w:'j',W:'j',' ':'j',z:'j',Z:'j'};
+c.addEventListener('pointerup',ptrEnd);c.addEventListener('pointercancel',ptrEnd);c.addEventListener('lostpointercapture',e=>{if(ptrs.has(e.pointerId)){ptrs.delete(e.pointerId);recompute()}});
+const KM={Shift:'b',x:'b',X:'b',ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r',ArrowDown:'d',s:'d',S:'d',ArrowUp:'j',w:'j',W:'j',' ':'j',z:'j',Z:'j'};
 addEventListener('keydown',e=>{if(panelOpen){if(e.key=='Escape'||e.key=='Enter'){$('pclose').click();e.preventDefault()}return}A();const k=KM[e.key];
  if(k&&state=='play'&&!paused){e.preventDefault();keys[k]=1;recompute();return}
  if(e.key=='p'||e.key=='P'||e.key=='Escape'){togglePause();return}if(e.key=='m'||e.key=='M'){setMute(!muted);return}
  if(e.key=='Enter'||e.key==' '){e.preventDefault();if(state=='title')start();else if(state=='over'&&gt-overAt>.8)start();else if(paused)togglePause();else if(state=='parade'&&sceneT>2.5)endParade();else if(state=='cake'&&(cakeSongT>11||cakeReplay))endCake()}});
 addEventListener('keyup',e=>{const k=KM[e.key];if(k){keys[k]=0;recompute()}});
-function bg(){if(state=='play'&&!paused)togglePause();keys={l:0,r:0,d:0,j:0};ptrs.clear();recompute()}
+function bg(){if(state=='play'&&!paused)togglePause();resetInput()}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)bg()});addEventListener('pagehide',bg);addEventListener('blur',bg);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 // ---------- effects queue from the (pure) simulation
@@ -90,6 +109,6 @@ function frame(now){requestAnimationFrame(frame);let rdt=Math.min(.05,(now-lastT
  if(run)advance(rdt);render(rdt)}
 function advance(rdt){if(banner){banner.t+=rdt;if(banner.t>(bannerQ.length?2.2:3.4))nextBanner()}
  if(state=='parade'||state=='cake'){sceneT+=rdt;if(state=='cake')cakeSongT+=rdt;return}
- if(state!='play'||!G)return;acc+=rdt;let n=0;while(acc>=DT&&n<4){acc-=DT;n++;const IN={l:held.l,r:held.r,d:held.d,j:held.j||tapJump>0};if(tapJump>0)tapJump--;step(G,IN);runFX();
+ if(state!='play'||!G)return;acc+=rdt;let n=0;while(acc>=DT&&n<4){acc-=DT;n++;const IN={l:held.l,r:held.r,d:held.d,j:held.j||tapJump>0,b:held.b};if(tapJump>0)tapJump--;step(G,IN);runFX();
   if(G.ph=='over'){gameOver();return}if(G.ph=='win'&&G.pht>3){toParade();return}}if(n==4)acc=0}
 onResize();buildFolk();setMute(muted);chrome();playSong('title');requestAnimationFrame(t=>{lastT=t;frame(t)});

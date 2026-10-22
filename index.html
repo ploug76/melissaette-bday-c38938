@@ -30,20 +30,28 @@ function readSafe(){try{if(window.__SAFE){SAFE=Object.assign({t:0,r:0,b:0,l:0},w
 function onResize(){readSafe();VW=innerWidth;VH=innerHeight;DPR=Math.min(devicePixelRatio||1,3);c.width=Math.round(VW*DPR);c.height=Math.round(VH*DPR);LY=computeLayout();[['pause',6],['mute',54],['help',102]].forEach(([id,r])=>{const e=$(id);e.style.top=(SAFE.t+6)+'px';e.style.right=(SAFE.r+r)+'px'})}
 function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T=SAFE.t,B=VH-SAFE.b,aw=R-L,ah=B-T;const portrait=ah>=aw*1.12;const o={L,R,T,B,aw,ah,portrait};
  o.dom={x:R-150,y:T+6,w:144,h:42};
+ // retro 8-bit controller: cross D-pad (arm = a px, >=56) + round B/A buttons (radius br)
  if(portrait){o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42},{x:L+8,y:T+52,w:aw-16,h:30}];
-  const top=T+88,ctrlMin=Math.min(200,Math.max(130,ah*.24));let fw=Math.min(aw,(ah-88-30-ctrlMin)*4/3);fw=Math.max(160,fw);const fh=fw*.75;
+  const a=CL(Math.floor(Math.min(aw/7,ah*.09)),56,72),br=CL(Math.round(a*.6),33,42),ph=3*a+58;
+  let fw=Math.min(aw,(ah-88-30-ph-10)*4/3);fw=Math.max(160,fw);const fh=fw*.75;const spare=Math.max(0,ah-88-fh-28-8-ph-6),top=T+88+Math.round(spare*.45);
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:L+8,y:top+fh+4,w:aw-16,h:24};
-  const cy0=o.lane.y+o.lane.h+8,cy1=B-8,ch=cy1-cy0;const bs=Math.max(54,Math.min(92,ch*.62,aw/4.7));const cy=cy0+ch/2;
-  o.btn={l:{x:L+12,y:cy-bs/2+bs*.18,w:bs,h:bs},r:{x:L+12+bs+12,y:cy-bs/2+bs*.18,w:bs,h:bs},d:{x:R-12-bs*1.15-12-bs*.85,y:cy-bs/2+bs*.4,w:bs*.85,h:bs*.85},j:{x:R-12-bs*1.15,y:cy-bs/2-bs*.12,w:bs*1.15,h:bs*1.15}};
-  o.ctrlArea={x:L,y:cy0,w:aw,h:ch}}
- else{o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42}];const top=T+54;let fh=ah-54-32,fw=fh*4/3;if((aw-fw)/2<112){fw=aw-224;fh=fw*.75}if(fh>ah-54-32){fh=ah-86;fw=fh*4/3}
+  const py=Math.max(o.lane.y+o.lane.h+8,B-6-ph);o.panel=[{x:L+6,y:py,w:aw-12,h:B-6-py}];
+  const cy=py+14+1.5*a+6;o.pad={cx:L+6+14+1.5*a,cy,a};
+  const ax=R-6-16-br,bx=ax-2*br-Math.max(12,Math.min(26,(ax-br-(o.pad.cx+1.5*a))-2*br-14));
+  o.ab={b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy-br*.35,r:br}};
+  o.ctrlArea={x:L,y:py,w:aw,h:B-py}}
+ else{o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42}];const top=T+54;const a=CL(Math.floor(ah*.15),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
+  let fh=ah-54-32,fw=fh*4/3;if((aw-fw)/2<side){fw=aw-2*side;fh=fw*.75}if(fh>ah-54-32){fh=ah-86;fw=fh*4/3}
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:o.field.x,y:top+fh+4,w:fw,h:24};
-  const sw=o.field.x-L-12,bs=Math.max(48,Math.min(84,sw*.46,ah*.22));const by=Math.min(B-12-bs,o.field.y+fh-bs);
-  const gp=Math.min(14,Math.max(6,sw-2*bs-8));o.btn={l:{x:L+8,y:by,w:bs,h:bs},r:{x:L+8+bs+gp,y:by,w:bs,h:bs},j:{x:R-8-bs*1.1,y:by-bs*.1,w:bs*1.1,h:bs*1.1},d:{x:R-8-bs*1.1-gp-bs*.85,y:by+bs*.15,w:bs*.85,h:bs*.85}};
-  if(o.btn.r.x+bs>o.field.x-8){o.btn.r.x=L+8;o.btn.r.y=by-bs-10}
-  if(o.btn.d.x<o.field.x+o.field.w+8){o.btn.d.x=R-8-bs*.85;o.btn.d.y=o.btn.j.y-bs*.85-10}
-  o.side=[{x:L+8,y:top,w:o.field.x-L-16,h:Math.max(0,Math.min(o.btn.l.y,o.btn.r.y)-top-10)},{x:o.field.x+fw+8,y:top,w:R-(o.field.x+fw)-16,h:Math.max(0,Math.min(o.btn.j.y,o.btn.d.y)-top-10)}];
+  const sw=o.field.x-L,cy=B-10-1.5*a;o.pad={cx:L+sw/2,cy,a};
+  const rx0=o.field.x+fw,rsw=R-rx0,acx=rx0+rsw/2+br+6,bcy=B-44-br;
+  o.ab={b:{cx:rx0+rsw/2-br-6,cy:bcy,r:br},a:{cx:acx,cy:bcy-br*.7,r:br}};
+  o.panel=[{x:L+4,y:cy-1.5*a-10,w:sw-8,h:B-4-(cy-1.5*a-10)},{x:rx0+4,y:o.ab.a.cy-br-12,w:rsw-8,h:B-4-(o.ab.a.cy-br-12)}];
+  o.side=[{x:L+8,y:top,w:sw-16,h:Math.max(0,o.panel[0].y-top-8)},{x:rx0+8,y:top,w:rsw-16,h:Math.max(0,o.panel[1].y-top-8)}];
   o.ctrlArea=null}
+ // bounding boxes (used by scene buttons / overlap tests); j = A button
+ const bb=q=>({x:q.cx-q.r,y:q.cy-q.r,w:2*q.r,h:2*q.r});const P=o.pad;
+ o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-1.5*P.a,w:3*P.a,h:3*P.a},b:bb(o.ab.b),j:bb(o.ab.a)};
  o.ws=o.field.w/FW;return o}
 addEventListener('resize',onResize);
 const ovl=(a,b,p=0)=>a.x<b.x+b.w+p&&b.x<a.x+a.w+p&&a.y<b.y+b.h+p&&b.y<a.y+a.h+p;
@@ -436,7 +444,7 @@ function defOf(rt){const d=ZONES[rt.zi].screens[rt.si];if(!rt.m)return d;const k
 const ROUTES={};function RT(G){return ROUTES[G.round]||(ROUTES[G.round]=makeRoute(G.round))}
 // ---------- skills (like the original's 4 skill options) & game state
 const SK=[null,{n:'STROLL',d:'No critters, no energy limit',crit:0,vill:0,drain:0,spd:.85},{n:'ADVENTURE',d:'Critters, villains & energy meter',crit:1,vill:1,drain:1.2,spd:1},{n:'BRAVE',d:'Faster critters, quicker drain',crit:1,vill:1,drain:1.65,spd:1.18},{n:'DARING',d:'Fastest of all!',crit:1,vill:1,drain:2.15,spd:1.35}];
-const V0=252,GH=620,GF=1500,RUN=80;
+const V0=252,GH=620,GF=1500,RUN=80,RUN_B=112;// RUN_B: holding B (run) on the retro pad
 let G=null,FXQ=[];
 function fx(...a){if(!SIM)FXQ.push(a)}
 function spd(G){return SK[G.skill].spd*(1+.12*(G.round-1))*(G.pw.slow>0?.5:1)}
@@ -488,9 +496,9 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
  p.duck=canMove&&IN.d&&p.on;p.h=p.duck?12:20;
  let dir=canMove&&!p.duck?(IN.r?1:0)-(IN.l?1:0):0;
  const under=p.on&&p.gi>=0?G.sol[p.gi]:null;const slip=under&&G.puddles.some(q=>Math.abs(q.y-under.y)<1&&Math.abs(p.x-q.x)<q.w/2+2);p.slip=slip;
- const maxv=p.big?122:RUN,acc=p.on?(slip?210:950):560,dec=p.on?(slip?150:1500):0;
+ const runv=IN.b?RUN_B:RUN,maxv=p.big?122:runv,acc=p.on?(slip?210:950):560,dec=p.on?(slip?150:1500):0;
  if(dir){p.vx+=CL(dir*maxv-p.vx,-acc*DT,acc*DT);p.face=dir}else if(dec){const s=Math.sign(p.vx);p.vx-=s*Math.min(Math.abs(p.vx),dec*DT)}
- if(!p.big&&p.on&&Math.abs(p.vx)>RUN)p.vx=Math.sign(p.vx)*RUN;
+ if(!p.big&&p.on&&Math.abs(p.vx)>runv)p.vx=Math.sign(p.vx)*runv;
  // jump: buffer + coyote time + variable height; a quick second tap in the air = Big Leap (the original's "push up again immediately")
  if(jp&&canMove)p.buf=.13;if(p.on)p.coy=.1;else p.coy-=DT;p.buf-=DT;
  const spring=G.pw.spring>0;
@@ -504,7 +512,7 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
  // horizontal move + collide
  p.x+=p.vx*DT;let s=solidHit(G,p.x-4,p.y-p.h,8,p.h-.5);if(s){if(p.x<s.x+s.w/2)p.x=s.x-4.01;else p.x=s.x+s.w+4.01;p.vx=0}
  // vertical
- const oy=p.y;p.y+=p.vy*DT;const wasOn=p.on;p.on=false;let landS=-1;
+ const oy=p.y;p.oy=oy;p.ovy=p.vy;p.jl=0;p.y+=p.vy*DT;const wasOn=p.on;p.on=false;let landS=-1;
  for(let i=0;i<G.sol.length;i++){const q=G.sol[i];if(q.k=='trap'&&q.open)continue;if(q.k=='plank'&&q.fall)continue;
   if(p.x+4<=q.x||p.x-4>=q.x+q.w)continue;
   if(p.vy>=0&&oy<=q.y+.01&&p.y>=q.y){if(landS<0||q.y<G.sol[landS].y)landS=i;continue}
@@ -513,7 +521,7 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
  else p.gi=-1;
  if(!p.on)p.air+=DT;else{p.air=0;if(Math.abs(p.vx)>5)p.walkT+=DT}
  if(p.on&&p.gi>=0&&G.sol[p.gi].k=='plank'&&G.sol[p.gi].ct<0){G.sol[p.gi].ct=0;fx('sfx','crumble')}}
-function land(G,p){p.jumping=false;p.big=false;p.bigUsed=true;fx('sfx','land');fx('dust',p.x,p.y);
+function land(G,p){p.jl=1;p.jumping=false;p.big=false;p.bigUsed=true;fx('sfx','land');fx('dust',p.x,p.y);
  if(p.x>p.jx+6){let pts=0;for(const o of G.obs){if(!o.done&&o.x>=p.jx-4&&o.x+o.w<=p.x+4){o.done=1;pts+=o.pts}}if(pts)addScore(G,pts,p.x,p.y-26)}}
 function addScore(G,n,x,y,col){G.score+=n;if(x!=null)fx('pop','+'+n,x,y,col||'#ffd84a');if(G.score>=G.nextLife){G.nextLife+=20000;G.lives=Math.min(9,G.lives+1);fx('sfx','oneup');fx('banner','Extra life!','#5edc78')}}
 // ---------- hurt / death
@@ -550,7 +558,7 @@ function step(G,IN){G.gt+=DT;const p=G.p;
  // entities
  const pb=pbox(p),hit=(x,y,w,h)=>p.inv<=0&&ovl(pb,{x,y,w,h});
  // creatures: land on top while falling = stomp (creature knocked out, small bounce, no harm); any other touch still hurts
- const stomp=(e,x,y,w,h)=>{if(!ovl(pb,{x,y,w,h}))return false;if(!(p.vy>0&&!p.on&&p.y<=y+h/2+4))return false;
+ const stomp=(e,x,y,w,h)=>{if(!ovl(pb,{x,y,w,h}))return false;if(!((p.vy>0&&!p.on&&p.y<=y+h/2+4)||(p.jl&&p.ovy>0&&p.oy<=y+h/2+4)))return false;// also counts the frame she touches down on a low creature (snakes are only 5px tall)
   e.dead=1;p.vy=-200;p.on=false;p.jumping=true;p.cut=true;p.bigUsed=true;p.big=false;fx('sfx','stomp');fx('poof',e.x,e.y);return true},
   crit=(e,x,y,w,h,why)=>{if(stomp(e,x,y,w,h))return;if(hit(x,y,w,h))hurt(G,why)};
  for(const e of G.ents){switch(e.k){
@@ -740,10 +748,27 @@ function drawHUD(){const L=LY,items=hudItems();let f=L.portrait?14:13;
    rr(box.x,box.y,box.w,box.h,9,'rgba(10,6,30,.72)','rgba(255,255,255,.55)',1.5);it.draw(box.x,box.y,H,f,box.w);reg('hud:'+it.k,box.x,box.y,box.w,box.h);r.cx+=ww+6;placed=true;break}}}
 function drawLane(){const L=LY.lane;let s,col='#cfe3ff';if(banner){s=banner.s;col=banner.col}else if(state=='play'&&G){const z=ZONES[G.zi];const rt=RT(G),i0=rt.findIndex(r=>r.zi==G.zi),n=rt.filter(r=>r.zi==G.zi).length;s=z.boss?z.name:`${z.name}  ${G.ri-i0+1}/${n}`+(G.round>1?`  •  Round ${G.round}`:'')}
  if(!s)return;const sz=fitSize(s,15,L.w-20);g.font=font(sz);const w=Math.min(L.w,g.measureText(s).width+24),x=L.x+(L.w-w)/2;rr(x,L.y,w,L.h,10,'rgba(10,6,30,.75)',banner?col:'rgba(255,255,255,.4)',1.5);txt(s,x+w/2,L.y+L.h/2+1,sz,col);reg('lane',x,L.y,w,L.h)}
-const CTRL_ICON={l:'◀',r:'▶',d:'▼',j:'JUMP'};
-function drawControls(){for(const k of ['l','r','d','j']){const b=LY.btn[k],on=held[k];rr(b.x,b.y,b.w,b.h,b.w*.28,on?'rgba(255,255,255,.42)':'rgba(255,255,255,.16)','rgba(255,255,255,.75)',2.5);
-  if(k=='j'){txt('▲',b.x+b.w/2,b.y+b.h*.36,b.w*.3,'#fff');txt('JUMP',b.x+b.w/2,b.y+b.h*.7,fitSize('JUMP',b.w*.2,b.w-12),'#fff')}else if(k=='d'){txt('▼',b.x+b.w/2,b.y+b.h*.42,b.w*.34,'#fff');txt('DUCK',b.x+b.w/2,b.y+b.h*.78,fitSize('DUCK',b.w*.18,b.w-12),'#fff')}else txt(CTRL_ICON[k],b.x+b.w/2,b.y+b.h/2+1,b.w*.4,'#fff');
-  reg('btn:'+k,b.x,b.y,b.w,b.h)}}
+// retro 8-bit style controller (generic: no brand names/logos)
+function padPath(cx,cy,a,w){const h=a*1.5,t=w/2;g.beginPath();g.moveTo(cx-t,cy-h);g.lineTo(cx+t,cy-h);g.lineTo(cx+t,cy-t);g.lineTo(cx+h,cy-t);g.lineTo(cx+h,cy+t);g.lineTo(cx+t,cy+t);g.lineTo(cx+t,cy+h);g.lineTo(cx-t,cy+h);g.lineTo(cx-t,cy+t);g.lineTo(cx-h,cy+t);g.lineTo(cx-h,cy-t);g.lineTo(cx-t,cy-t);g.closePath()}
+function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath();g.moveTo(s,0);g.lineTo(-s*.7,-s*.85);g.lineTo(-s*.7,s*.85);g.closePath();g.fillStyle=col;g.fill();g.restore()}
+function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
+ for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
+ if(L.portrait){const pn=L.panel[0];txt('MELISSAETTE',(L.ab.b.cx+L.ab.a.cx)/2,pn.y+24,fitSize('MELISSAETTE',16,L.ab.a.cx-L.ab.b.cx+2*L.ab.a.r),'#ff86a6','center',{f:MONO})}
+ // D-pad
+ g.save();g.shadowColor='rgba(0,0,0,.5)';g.shadowOffsetY=4;padPath(cx,cy,a,a);g.fillStyle='#111015';g.fill();g.restore();
+ const lit={l:held.l,r:held.r,u:held.j&&padHeld.u,d:held.d};
+ const arm={l:[cx-a,cy],r:[cx+a,cy],u:[cx,cy-a],d:[cx,cy+a]},ang={l:PI,r:0,u:-PI/2,d:PI/2};
+ for(const k of ['l','r','u','d']){const [x,y]=arm[k];if(lit[k]){rr(x-a/2+3,y-a/2+3,a-6,a-6,8,'rgba(255,216,74,.85)',null)}tri(x+(k=='l'?-a*.08:k=='r'?a*.08:0),y+(k=='u'?-a*.08:k=='d'?a*.08:0),a*.22,ang[k],lit[k]?'#1b1440':'#8f8c99')}
+ g.beginPath();g.arc(cx,cy,a*.22,0,TAU);g.fillStyle='#1d1b22';g.fill();g.strokeStyle='#3a3742';g.lineWidth=2;g.stroke();
+ txt('JUMP',cx+a*.6,cy-a*1.2,16,'#cfcad8','left');txt('DUCK',cx+a*.6,cy+a*1.2,16,'#cfcad8','left');
+ reg('btn:pad',cx-1.5*a,cy-1.5*a,3*a,3*a);
+ // B / A
+ for(const k of ['b','a']){const q=L.ab[k],on=k=='a'?held.j&&padHeld.a:held.b;const dy=on?2:0;
+  g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
+  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
+  g.beginPath();g.arc(q.cx-q.r*.3,q.cy+dy-q.r*.35,q.r*.28,0,TAU);g.fillStyle='rgba(255,255,255,.28)';g.fill();
+  txt(k.toUpperCase(),q.cx,q.cy+dy+1,Math.round(q.r*.75),'#fff','center',{stroke:3,sc:'rgba(0,0,0,.45)'});
+  txt(k=='a'?'JUMP':'RUN',q.cx,q.cy+q.r+13,16,'#cfcad8','center');reg('btn:'+k,q.cx-q.r,q.cy-q.r,2*q.r,2*q.r)}}
 function w2s(x,y){return[LY.field.x+x*LY.ws,LY.field.y+y*LY.ws]}
 function drawPops(dt){const F=LY.field;for(const q of POPS){q.t+=dt;q.y-=18*dt}POPS=POPS.filter(q=>q.t<1.1);
  for(const q of POPS){let [sx,sy]=w2s(q.x,q.y);const sz=Math.max(12,Math.round(LY.ws*7));g.font=font(sz);const w=g.measureText(q.s).width+8,h=sz+6;let box={x:sx-w/2,y:sy-h/2,w,h};
@@ -835,8 +860,7 @@ function togglePause(){if(state!='play')return;paused=!paused;held={l:0,r:0,d:0,
 function chrome(){$('pause').style.display=state=='play'?'block':'none';$('mute').style.display='block';$('help').style.display=state=='title'||state=='play'?'block':'none';$('pause').textContent=paused?'▶':'⏸';$('pause').setAttribute('aria-label',paused?'Resume':'Pause');try{if(window.__dock)__dock.tick()}catch(e){}}
 function showHelp(){if(state=='play'&&!paused)togglePause();panelOpen=true;$('ptext').innerHTML=`<h2>👒 Melissaette: Rescue in Gargamel's Castle</h2>
 <p>The wicked wizard <b>Gargamel</b> and his cat <b>Azrael</b> have carried off Melissaette's Smurf friends! Walk right, screen by screen, through the village, fields, hills, river, woods and cavern to the castle, and set everyone free.</p>
-<h3>Controls</h3><ul><li><b>◀ ▶</b> walk, <b>▼</b> duck (under low bats, hawks and spiders).</li><li><b>JUMP</b>: tap for a hop, <b>hold for a higher jump</b>.</li><li><b>Big Leap</b>: tap JUMP again <i>right away</i> while rising, just like the 1982 classic.</li><li>Or touch the play area: swipe up to jump, swipe down to duck, drag sideways to walk, tap to hop.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, P pause, M mute.</li></ul>
-<h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
+<h3>Controls</h3><ul><li><b>D-pad</b> (bottom left): <b>◀ ▶</b> walk, <b>▲</b> jump, <b>▼</b> duck (under low bats, hawks and spiders). Slide your thumb to change direction; corners press two directions.</li><li><b>A</b>: jump. Tap for a hop, <b>hold for a higher jump</b>.</li><li><b>B</b>: hold to <b>run</b> faster (hold B + ▶, then A for a long jump).</li><li><b>Big Leap</b>: tap A again <i>right away</i> while rising, just like the 1982 classic.</li><li>Or touch the play area: swipe up to jump, swipe down to duck, drag sideways to walk, tap to hop.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, Shift or X to run, P pause, M mute.</li></ul><h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
 <h3>Energy</h3><p>Her energy drains as she walks and refills only when she reaches a <b>new land</b>. Leftover energy is bonus points!</p>
 <h3>Gifts</h3><ul><li>🫧 Bubble shield: saves you from one oops.</li><li>👟 Spring shoes: higher jumps for 20 s.</li><li>🐌 Snail-time: slows critters and villains.</li><li>🧁 Cupcake: +50 energy.</li></ul>
 <h3>🎵 Soundtrack</h3><p>Every land plays its own 8-bit 80s movie hit: Pretty in Pink, Don't You (Forget About Me), Footloose, Girls Just Want to Have Fun, The Power of Love, Take My Breath Away, Ghostbusters and Danger Zone, with The Time of My Life on the title and parade.</p><h3>🕯️ 54 birthday candles</h3><p>54 candles are hidden along the way. Some only appear when you get close, and some need a high jump or a Big Leap. Candles you've found stay found on this device. Find all 54 for a secret birthday surprise at the end!</p>
@@ -849,30 +873,50 @@ $('pause').onclick=e=>{e.stopPropagation();A();togglePause()};
 $('help').onclick=e=>{e.stopPropagation();A();showHelp()};
 function songBanner(id){if(SONG_TITLES[id])setBanner('♪ '+SONG_TITLES[id],'#ff86a6')}
 function curMusic(){return state=='play'&&G?ZONES[G.zi].music:state=='parade'?'parade':state=='cake'?'bday':'title'}
-// ---------- input: on-screen buttons (multi-touch), play-area swipes, keyboard
-let held={l:0,r:0,d:0,j:0},keys={l:0,r:0,d:0,j:0},ptrs=new Map(),downBtn=null;
+// ---------- input: retro controller (D-pad + B/A, multi-touch), play-area swipes, keyboard
+let held={l:0,r:0,d:0,j:0,b:0},keys={l:0,r:0,d:0,j:0,b:0},ptrs=new Map(),downBtn=null,padHeld={u:0,a:0};
 const inR=(b,x,y,p=0)=>x>=b.x-p&&x<=b.x+b.w+p&&y>=b.y-p&&y<=b.y+b.h+p;
-function btnAt(x,y){let best=null,bd=1e9;for(const k of ['l','r','d','j']){const b=LY.btn[k];if(inR(b,x,y,10)){const d=Math.hypot(x-(b.x+b.w/2),y-(b.y+b.h/2));if(d<bd){bd=d;best=k}}}return best}
-function recompute(){const h={l:0,r:0,d:0,j:0};for(const q of ptrs.values()){if(q.b)h[q.b]=1;if(q.sw)for(const k of q.sw)h[k]=1}for(const k in h)h[k]=h[k]||keys[k];held=h}
+// D-pad: direction from the pad centre (8-way: diagonals press both), works even if the thumb slides off the pad
+function padDirs(x,y){const P=LY.pad,dx=x-P.cx,dy=y-P.cy,ax=Math.abs(dx),ay=Math.abs(dy),o=[];if(Math.hypot(dx,dy)<P.a*.32)return o;
+ const T=2.414;if(ax>ay/T)o.push(dx>0?'r':'l');if(ay>ax/T)o.push(dy>0?'d':'u');return o}
+function onPad(x,y){const P=LY.pad,h=P.a*1.5+14;return Math.abs(x-P.cx)<=h&&Math.abs(y-P.cy)<=h}
+// B/A: every button whose (padded) circle holds the point, so a thumb between them presses both
+function abAt(x,y,pad=12){const o=[];for(const k of ['b','a']){const q=LY.ab[k];if(Math.hypot(x-q.cx,y-q.cy)<=q.r+pad)o.push(k)}return o}
+function inPanel(x,y){return LY.panel.some(p=>inR(p,x,y,0))}
+function recompute(){const h={l:0,r:0,d:0,j:0,b:0},ph={u:0,a:0};for(const q of ptrs.values()){
+  if(q.pad)for(const k of q.pad){if(k=='u'){h.j=1;ph.u=1}else h[k]=1}
+  if(q.ab)for(const k of q.ab){if(k=='a'){h.j=1;ph.a=1}else h.b=1}
+  if(q.sw)for(const k of q.sw)h[k]=1}
+ for(const k in h)h[k]=h[k]||keys[k];
+ for(const k of ['l','r','d','j','b'])if(h[k]&&!held[k])vib(10);held=h;padHeld=ph}
+function resetInput(){ptrs.clear();keys={l:0,r:0,d:0,j:0,b:0};recompute()}
 c.addEventListener('pointerdown',e=>{e.preventDefault();A();if(!musicOn)playSong(curMusic());const x=e.clientX,y=e.clientY;
  if(state!='play'||paused){downBtn=menuBtns.find(b=>inR(b,x,y,4))||null;return}
- const b=btnAt(x,y);if(b){ptrs.set(e.pointerId,{b});recompute();return}
+ try{c.setPointerCapture(e.pointerId)}catch(_){}
+ if(onPad(x,y)){ptrs.set(e.pointerId,{pad:padDirs(x,y)});recompute();return}
+ const ab=abAt(x,y);if(ab.length){ptrs.set(e.pointerId,{ab});recompute();return}
+ if(inPanel(x,y)){ptrs.set(e.pointerId,{dead:1});return}
  ptrs.set(e.pointerId,{x0:x,y0:y,t0:performance.now(),sw:[],moved:false});recompute()},{passive:false});
-c.addEventListener('pointermove',e=>{const q=ptrs.get(e.pointerId);if(!q)return;const x=e.clientX,y=e.clientY;
- if(q.b){const b=btnAt(x,y);if(b&&b!=q.b&&!(q.b=='j'||b=='j')){q.b=b;recompute()}return}
+c.addEventListener('pointermove',e=>{const q=ptrs.get(e.pointerId);if(!q||q.dead)return;const x=e.clientX,y=e.clientY;
+ if(q.pad){const d=padDirs(x,y);if(d.join()!=q.pad.join()){q.pad=d;recompute()}return}
+ if(q.ab){const b=abAt(x,y,16);if(b.length&&b.join()!=q.ab.join()){q.ab=b;recompute()}return}
  const dx=x-q.x0,dy=y-q.y0,th=16;const sw=[];if(dy<-th&&Math.abs(dy)>Math.abs(dx)*.6)sw.push('j');else if(dy>th&&Math.abs(dy)>Math.abs(dx))sw.push('d');if(Math.abs(dx)>th&&Math.abs(dx)>Math.abs(dy)*.6)sw.push(dx>0?'r':'l');
  if(sw.length)q.moved=true;q.sw=sw;recompute()});
+// no stuck inputs, no scrolling/zooming/long-press menus on the controller
+c.addEventListener('contextmenu',e=>e.preventDefault());
+['touchstart','touchmove'].forEach(ev=>c.addEventListener(ev,e=>{if(e.cancelable)e.preventDefault()},{passive:false}));
+['touchend','touchcancel'].forEach(ev=>c.addEventListener(ev,e=>{if(e.cancelable)e.preventDefault();if(ev=='touchcancel'||!e.touches.length){ptrs.clear();recompute()}},{passive:false}));
 let tapJump=0;
-function ptrEnd(e){const q=ptrs.get(e.pointerId);if(q){ptrs.delete(e.pointerId);if(!q.b&&!q.moved&&performance.now()-q.t0<300&&e.type=='pointerup')tapJump=8;recompute()}
+function ptrEnd(e){const q=ptrs.get(e.pointerId);if(q){ptrs.delete(e.pointerId);if(!q.pad&&!q.ab&&!q.dead&&!q.moved&&performance.now()-q.t0<300&&e.type=='pointerup')tapJump=8;recompute()}
  if(downBtn&&e.type=='pointerup'){const x=e.clientX,y=e.clientY;const b=menuBtns.find(b=>inR(b,x,y,6));if(b&&b.x==downBtn.x&&b.y==downBtn.y){SFX.click();b.fn()}}downBtn=null}
-c.addEventListener('pointerup',ptrEnd);c.addEventListener('pointercancel',ptrEnd);
-const KM={ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r',ArrowDown:'d',s:'d',S:'d',ArrowUp:'j',w:'j',W:'j',' ':'j',z:'j',Z:'j'};
+c.addEventListener('pointerup',ptrEnd);c.addEventListener('pointercancel',ptrEnd);c.addEventListener('lostpointercapture',e=>{if(ptrs.has(e.pointerId)){ptrs.delete(e.pointerId);recompute()}});
+const KM={Shift:'b',x:'b',X:'b',ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r',ArrowDown:'d',s:'d',S:'d',ArrowUp:'j',w:'j',W:'j',' ':'j',z:'j',Z:'j'};
 addEventListener('keydown',e=>{if(panelOpen){if(e.key=='Escape'||e.key=='Enter'){$('pclose').click();e.preventDefault()}return}A();const k=KM[e.key];
  if(k&&state=='play'&&!paused){e.preventDefault();keys[k]=1;recompute();return}
  if(e.key=='p'||e.key=='P'||e.key=='Escape'){togglePause();return}if(e.key=='m'||e.key=='M'){setMute(!muted);return}
  if(e.key=='Enter'||e.key==' '){e.preventDefault();if(state=='title')start();else if(state=='over'&&gt-overAt>.8)start();else if(paused)togglePause();else if(state=='parade'&&sceneT>2.5)endParade();else if(state=='cake'&&(cakeSongT>11||cakeReplay))endCake()}});
 addEventListener('keyup',e=>{const k=KM[e.key];if(k){keys[k]=0;recompute()}});
-function bg(){if(state=='play'&&!paused)togglePause();keys={l:0,r:0,d:0,j:0};ptrs.clear();recompute()}
+function bg(){if(state=='play'&&!paused)togglePause();resetInput()}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)bg()});addEventListener('pagehide',bg);addEventListener('blur',bg);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 // ---------- effects queue from the (pure) simulation
@@ -911,7 +955,7 @@ function frame(now){requestAnimationFrame(frame);let rdt=Math.min(.05,(now-lastT
  if(run)advance(rdt);render(rdt)}
 function advance(rdt){if(banner){banner.t+=rdt;if(banner.t>(bannerQ.length?2.2:3.4))nextBanner()}
  if(state=='parade'||state=='cake'){sceneT+=rdt;if(state=='cake')cakeSongT+=rdt;return}
- if(state!='play'||!G)return;acc+=rdt;let n=0;while(acc>=DT&&n<4){acc-=DT;n++;const IN={l:held.l,r:held.r,d:held.d,j:held.j||tapJump>0};if(tapJump>0)tapJump--;step(G,IN);runFX();
+ if(state!='play'||!G)return;acc+=rdt;let n=0;while(acc>=DT&&n<4){acc-=DT;n++;const IN={l:held.l,r:held.r,d:held.d,j:held.j||tapJump>0,b:held.b};if(tapJump>0)tapJump--;step(G,IN);runFX();
   if(G.ph=='over'){gameOver();return}if(G.ph=='win'&&G.pht>3){toParade();return}}if(n==4)acc=0}
 onResize();buildFolk();setMute(muted);chrome();playSong('title');requestAnimationFrame(t=>{lastT=t;frame(t)});
 // ---------- test hooks + search bot (plays the real engine on cloned game states)
@@ -948,7 +992,7 @@ function candleProof(sk=2){const res=[];const R1=RT({round:1});
  return{total:res.length,ok:res.filter(r=>r.ok).length,fail:res.filter(r=>!r.ok)}}
 window.__T={layout(){return{els:UIE.map(e=>({...e})),SAFE:{l:SAFE.l,t:SAFE.t,r:VW-SAFE.r,b:VH-SAFE.b},state,paused,LY}},
  start(sk){if(sk)skill=sk;start()},step(n=1){for(let i=0;i<n;i++){advance(DT);render(DT)}},get G(){return G},set G(v){G=v},toTitle,togglePause,toParade,toCake,endParade,gameOver,showHelp,
- closeHelp(){$('pclose').click()},setHeld(h){held=Object.assign({l:0,r:0,d:0,j:0},h)},bsearch,botPlay,candleProof,replay,BOSS_GOALS,screenGoals,ZONES,SK,
+ closeHelp(){$('pclose').click()},setHeld(h){held=Object.assign({l:0,r:0,d:0,j:0,b:0},h)},bsearch,botPlay,candleProof,replay,BOSS_GOALS,screenGoals,ZONES,SK,
  goScreen(ri){G.ri=ri;G.entryX=10;G.p=newPlayer(10);buildScreen(G,1);G.ph='play';playSong(ZONES[G.zi].music)},
  setFound(n){foundEver=[...Array(n).keys()];ST.set('candles',foundEver)},banner:setBanner,get foundEver(){return foundEver},runFX,sceneT:()=>sceneT,setSceneT(v){sceneT=v;cakeSongT=v}};
 </script><!--share--><style>#dock{position:fixed;z-index:60;display:none;gap:6px;top:0;left:0}#dock.inl{position:static;display:flex;justify-content:center;flex-wrap:wrap;margin:6px auto}

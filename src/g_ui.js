@@ -19,10 +19,27 @@ function drawHUD(){const L=LY,items=hudItems();let f=L.portrait?14:13;
    rr(box.x,box.y,box.w,box.h,9,'rgba(10,6,30,.72)','rgba(255,255,255,.55)',1.5);it.draw(box.x,box.y,H,f,box.w);reg('hud:'+it.k,box.x,box.y,box.w,box.h);r.cx+=ww+6;placed=true;break}}}
 function drawLane(){const L=LY.lane;let s,col='#cfe3ff';if(banner){s=banner.s;col=banner.col}else if(state=='play'&&G){const z=ZONES[G.zi];const rt=RT(G),i0=rt.findIndex(r=>r.zi==G.zi),n=rt.filter(r=>r.zi==G.zi).length;s=z.boss?z.name:`${z.name}  ${G.ri-i0+1}/${n}`+(G.round>1?`  •  Round ${G.round}`:'')}
  if(!s)return;const sz=fitSize(s,15,L.w-20);g.font=font(sz);const w=Math.min(L.w,g.measureText(s).width+24),x=L.x+(L.w-w)/2;rr(x,L.y,w,L.h,10,'rgba(10,6,30,.75)',banner?col:'rgba(255,255,255,.4)',1.5);txt(s,x+w/2,L.y+L.h/2+1,sz,col);reg('lane',x,L.y,w,L.h)}
-const CTRL_ICON={l:'◀',r:'▶',d:'▼',j:'JUMP'};
-function drawControls(){for(const k of ['l','r','d','j']){const b=LY.btn[k],on=held[k];rr(b.x,b.y,b.w,b.h,b.w*.28,on?'rgba(255,255,255,.42)':'rgba(255,255,255,.16)','rgba(255,255,255,.75)',2.5);
-  if(k=='j'){txt('▲',b.x+b.w/2,b.y+b.h*.36,b.w*.3,'#fff');txt('JUMP',b.x+b.w/2,b.y+b.h*.7,fitSize('JUMP',b.w*.2,b.w-12),'#fff')}else if(k=='d'){txt('▼',b.x+b.w/2,b.y+b.h*.42,b.w*.34,'#fff');txt('DUCK',b.x+b.w/2,b.y+b.h*.78,fitSize('DUCK',b.w*.18,b.w-12),'#fff')}else txt(CTRL_ICON[k],b.x+b.w/2,b.y+b.h/2+1,b.w*.4,'#fff');
-  reg('btn:'+k,b.x,b.y,b.w,b.h)}}
+// retro 8-bit style controller (generic: no brand names/logos)
+function padPath(cx,cy,a,w){const h=a*1.5,t=w/2;g.beginPath();g.moveTo(cx-t,cy-h);g.lineTo(cx+t,cy-h);g.lineTo(cx+t,cy-t);g.lineTo(cx+h,cy-t);g.lineTo(cx+h,cy+t);g.lineTo(cx+t,cy+t);g.lineTo(cx+t,cy+h);g.lineTo(cx-t,cy+h);g.lineTo(cx-t,cy+t);g.lineTo(cx-h,cy+t);g.lineTo(cx-h,cy-t);g.lineTo(cx-t,cy-t);g.closePath()}
+function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath();g.moveTo(s,0);g.lineTo(-s*.7,-s*.85);g.lineTo(-s*.7,s*.85);g.closePath();g.fillStyle=col;g.fill();g.restore()}
+function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
+ for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
+ if(L.portrait){const pn=L.panel[0];txt('MELISSAETTE',(L.ab.b.cx+L.ab.a.cx)/2,pn.y+24,fitSize('MELISSAETTE',16,L.ab.a.cx-L.ab.b.cx+2*L.ab.a.r),'#ff86a6','center',{f:MONO})}
+ // D-pad
+ g.save();g.shadowColor='rgba(0,0,0,.5)';g.shadowOffsetY=4;padPath(cx,cy,a,a);g.fillStyle='#111015';g.fill();g.restore();
+ const lit={l:held.l,r:held.r,u:held.j&&padHeld.u,d:held.d};
+ const arm={l:[cx-a,cy],r:[cx+a,cy],u:[cx,cy-a],d:[cx,cy+a]},ang={l:PI,r:0,u:-PI/2,d:PI/2};
+ for(const k of ['l','r','u','d']){const [x,y]=arm[k];if(lit[k]){rr(x-a/2+3,y-a/2+3,a-6,a-6,8,'rgba(255,216,74,.85)',null)}tri(x+(k=='l'?-a*.08:k=='r'?a*.08:0),y+(k=='u'?-a*.08:k=='d'?a*.08:0),a*.22,ang[k],lit[k]?'#1b1440':'#8f8c99')}
+ g.beginPath();g.arc(cx,cy,a*.22,0,TAU);g.fillStyle='#1d1b22';g.fill();g.strokeStyle='#3a3742';g.lineWidth=2;g.stroke();
+ txt('JUMP',cx+a*.6,cy-a*1.2,16,'#cfcad8','left');txt('DUCK',cx+a*.6,cy+a*1.2,16,'#cfcad8','left');
+ reg('btn:pad',cx-1.5*a,cy-1.5*a,3*a,3*a);
+ // B / A
+ for(const k of ['b','a']){const q=L.ab[k],on=k=='a'?held.j&&padHeld.a:held.b;const dy=on?2:0;
+  g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
+  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
+  g.beginPath();g.arc(q.cx-q.r*.3,q.cy+dy-q.r*.35,q.r*.28,0,TAU);g.fillStyle='rgba(255,255,255,.28)';g.fill();
+  txt(k.toUpperCase(),q.cx,q.cy+dy+1,Math.round(q.r*.75),'#fff','center',{stroke:3,sc:'rgba(0,0,0,.45)'});
+  txt(k=='a'?'JUMP':'RUN',q.cx,q.cy+q.r+13,16,'#cfcad8','center');reg('btn:'+k,q.cx-q.r,q.cy-q.r,2*q.r,2*q.r)}}
 function w2s(x,y){return[LY.field.x+x*LY.ws,LY.field.y+y*LY.ws]}
 function drawPops(dt){const F=LY.field;for(const q of POPS){q.t+=dt;q.y-=18*dt}POPS=POPS.filter(q=>q.t<1.1);
  for(const q of POPS){let [sx,sy]=w2s(q.x,q.y);const sz=Math.max(12,Math.round(LY.ws*7));g.font=font(sz);const w=g.measureText(q.s).width+8,h=sz+6;let box={x:sx-w/2,y:sy-h/2,w,h};

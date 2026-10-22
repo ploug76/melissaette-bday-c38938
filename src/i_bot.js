@@ -32,6 +32,6 @@ function candleProof(sk=2){const res=[];const R1=RT({round:1});
  return{total:res.length,ok:res.filter(r=>r.ok).length,fail:res.filter(r=>!r.ok)}}
 window.__T={layout(){return{els:UIE.map(e=>({...e})),SAFE:{l:SAFE.l,t:SAFE.t,r:VW-SAFE.r,b:VH-SAFE.b},state,paused,LY}},
  start(sk){if(sk)skill=sk;start()},step(n=1){for(let i=0;i<n;i++){advance(DT);render(DT)}},get G(){return G},set G(v){G=v},toTitle,togglePause,toParade,toCake,endParade,gameOver,showHelp,
- closeHelp(){$('pclose').click()},setHeld(h){held=Object.assign({l:0,r:0,d:0,j:0},h)},bsearch,botPlay,candleProof,replay,BOSS_GOALS,screenGoals,ZONES,SK,
+ closeHelp(){$('pclose').click()},setHeld(h){held=Object.assign({l:0,r:0,d:0,j:0,b:0},h)},bsearch,botPlay,candleProof,replay,BOSS_GOALS,screenGoals,ZONES,SK,
  goScreen(ri){G.ri=ri;G.entryX=10;G.p=newPlayer(10);buildScreen(G,1);G.ph='play';playSong(ZONES[G.zi].music)},
  setFound(n){foundEver=[...Array(n).keys()];ST.set('candles',foundEver)},banner:setBanner,get foundEver(){return foundEver},runFX,sceneT:()=>sceneT,setSceneT(v){sceneT=v;cakeSongT=v}};
