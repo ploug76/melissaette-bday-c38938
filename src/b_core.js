@@ -74,6 +74,7 @@ const SFX={
  creak(){tone(140,.3,'sawtooth',.05,90)},
  lever(){tone(220,.06,'square',.1);tone(330,.08,'square',.1,0,.07)},
  bonk(){tone(180,.12,'square',.12,80)},
+ stomp(){tone(520,.07,'square',.1,1100);noise(.08,.15,1500,.6,'bandpass',.03)},
  lowE(){tone(880,.07,'square',.05)},
  shield(){tone(700,.2,'sine',.1,1400)},
  zone(){[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.11,'square',.08,0,i*.09))},

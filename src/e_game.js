@@ -113,16 +113,20 @@ function step(G,IN){G.gt+=DT;const p=G.p;
    fx('banner',ev.k=='potion'?'Gargamel throws a slippery potion!':ev.k=='spell'?'Gargamel casts a spell! Duck or jump!':'Gargamel drops his net!','#c95bba')}}
  // entities
  const pb=pbox(p),hit=(x,y,w,h)=>p.inv<=0&&ovl(pb,{x,y,w,h});
+ // creatures: land on top while falling = stomp (creature knocked out, small bounce, no harm); any other touch still hurts
+ const stomp=(e,x,y,w,h)=>{if(!ovl(pb,{x,y,w,h}))return false;if(!(p.vy>0&&!p.on&&p.y<=y+h/2+4))return false;
+  e.dead=1;p.vy=-200;p.on=false;p.jumping=true;p.cut=true;p.bigUsed=true;p.big=false;fx('sfx','stomp');fx('poof',e.x,e.y);return true},
+  crit=(e,x,y,w,h,why)=>{if(stomp(e,x,y,w,h))return;if(hit(x,y,w,h))hurt(G,why)};
  for(const e of G.ents){switch(e.k){
-  case 'bat':e.age+=DT;e.x-=58*S*DT;e.y=e.y0+Math.sin(e.age*6)*2;if(hit(e.x-5,e.y-3,10,6))hurt(G,'bat');if(e.x<-20)e.dead=1;break;
-  case 'hawk':{const u=(G.t-e.t0)/(e.T/S);if(u>1){e.dead=1;break}const a=(1-u)*(1-u),b=2*(1-u)*u,cc=u*u;e.x=a*e.S[0]+b*e.C[0]+cc*e.E[0];e.y=a*e.S[1]+b*e.C[1]+cc*e.E[1];if(hit(e.x-6,e.y-3,12,6))hurt(G,'hawk');break}
-  case 'spider':{const lowY=e.low||141,tt=((G.t*S+e.ph)%e.per)/e.per;let k=0;if(tt<.28)k=tt/.28;else if(tt<.55)k=1;else if(tt<.8)k=1-(tt-.55)/.25;e.y=e.y0+(lowY-e.y0)*k;if(hit(e.x-4,e.y-3,8,6))hurt(G,'spider');break}
-  case 'snake':e.x+=e.dir*e.v*S*DT;if(e.x>e.x2){e.x=e.x2;e.dir=-1}if(e.x<e.x1){e.x=e.x1;e.dir=1}if(hit(e.x-8,e.y-5,16,5))hurt(G,'snake');break;
+  case 'bat':e.age+=DT;e.x-=58*S*DT;e.y=e.y0+Math.sin(e.age*6)*2;crit(e,e.x-5,e.y-3,10,6,'bat');if(e.x<-20)e.dead=1;break;
+  case 'hawk':{const u=(G.t-e.t0)/(e.T/S);if(u>1){e.dead=1;break}const a=(1-u)*(1-u),b=2*(1-u)*u,cc=u*u;e.x=a*e.S[0]+b*e.C[0]+cc*e.E[0];e.y=a*e.S[1]+b*e.C[1]+cc*e.E[1];crit(e,e.x-6,e.y-3,12,6,'hawk');break}
+  case 'spider':{const lowY=e.low||141,tt=((G.t*S+e.ph)%e.per)/e.per;let k=0;if(tt<.28)k=tt/.28;else if(tt<.55)k=1;else if(tt<.8)k=1-(tt-.55)/.25;e.y=e.y0+(lowY-e.y0)*k;crit(e,e.x-4,e.y-3,8,6,'spider');break}
+  case 'snake':e.x+=e.dir*e.v*S*DT;if(e.x>e.x2){e.x=e.x2;e.dir=-1}if(e.x<e.x1){e.x=e.x1;e.dir=1}crit(e,e.x-8,e.y-5,16,5,'snake');break;
   case 'cat':e.tm+=DT;if(e.st=='run'){e.x+=e.vx*S*DT;if(p.x>e.x&&p.x-e.x<46){e.st='crouch';e.tm=0;fx('sfx','hiss2')}if(e.x>FW+24)e.dead=1}
    else if(e.st=='crouch'){if(e.tm>.42/S){e.st='pounce';e.vy=-235;e.vx=150;fx('sfx','meow')}}
    else if(e.st=='pounce'){e.x+=e.vx*S*DT;e.vy+=900*S*DT;e.y+=e.vy*S*DT;if(e.y>=GY){e.y=GY;e.st='leave';e.vx=140}}
    else{e.x+=e.vx*S*DT;if(e.x>FW+24)e.dead=1}
-   if(hit(e.x-9,e.y-12,18,10))hurt(G,'cat');break;
+   crit(e,e.x-9,e.y-12,18,10,'cat');break;
   case 'dropcat':e.tm+=DT;if(e.st=='sit'&&p.x>=e.trig){e.st='paw';e.tm=0;fx('sfx','meow');G.ents.push({k:'drop',x:e.x,y:e.y,vy:0,tm:0,st:'wob',kind:ZONES[G.zi].theme=='cave'?'rock':'apple'})}
    else if(e.st=='paw'&&e.tm>2.2){e.st='gone'}break;
   case 'drop':e.tm+=DT;if(e.st=='wob'){if(e.tm>.5/S){e.st='fall'}}else if(e.st=='fall'){e.vy+=600*S*DT;e.y+=e.vy*S*DT;const t=topAt(G,e.x,0);if(e.y>=t){e.y=t;e.st='broke';e.tm=0;fx('sfx','bonk')}if(hit(e.x-4,e.y-8,8,8))hurt(G,'drop')}else if(e.tm>.5)e.dead=1;break;
@@ -133,8 +137,8 @@ function step(G,IN){G.gt+=DT;const p=G.p;
    if(landed){e.dead=1;G.puddles.push({x:e.x,y:landed.y,w:30,age:0});fx('sfx','slosh')}else if(e.y>FH+10)e.dead=1;break}
   case 'net':e.vy+=420*DT;e.y+=e.vy*DT;{const t=topAt(G,e.x,0);if(e.y>=t){e.dead=1;G.ents.push({k:'netg',x:e.x,y:t,tm:0});fx('sfx','net');if(Math.abs(p.x-e.x)<16&&p.y>t-30&&p.inv<=0){if(G.pw.shield>0){G.pw.shield=0;p.inv=1.4;fx('sfx','shield')}else{p.net=1.5;G.energy=Math.max(1,G.energy-12);fx('banner','Caught in the net! Tap JUMP to wriggle free!','#ffd84a')}}}}break;
   case 'netg':e.tm+=DT;if(e.tm>1.2)e.dead=1;break;
-  case 'bcat':stepBossCat(G,e,S);break;
-  case 'gbat':e.a+=DT*1.9*S;e.x=222+Math.cos(e.a)*22;e.y=36+Math.sin(e.a*2)*12;if(hit(e.x-5,e.y-3,10,6))hurt(G,'bat');break;
+  case 'bcat':stepBossCat(G,e,S,stomp);break;
+  case 'gbat':e.a+=DT*1.9*S;e.x=222+Math.cos(e.a)*22;e.y=36+Math.sin(e.a*2)*12;crit(e,e.x-5,e.y-3,10,6,'bat');break;
   case 'yarn':e.vy+=500*DT;e.y+=e.vy*DT;if(e.y>=GY-3){e.y=GY-3;e.vy=0;e.x+=e.vx*DT;e.vx*=.985}break}}
  if(G.ents.some(e=>e.dead))G.ents=G.ents.filter(e=>!e.dead);
  for(const q of G.puddles)q.age+=DT;
@@ -166,12 +170,12 @@ function stepWiz(G,e,S){e.tm+=DT;const p=G.p;
  else if(e.act=='spell'){const n=e.a||3;const fire=Math.floor((e.tm-.6)/.65);if(e.tm>.6&&fire>=e.n&&e.n<n){e.n++;e.pose='throw';const x0=e.x-8,y0=e.y-28,tx=p.x,ty=p.y-10,d=Math.hypot(tx-x0,ty-y0)||1,v=88*S;G.ents.push({k:'orb',x:x0,y:y0,vx:(tx-x0)/d*v,vy:(ty-y0)/d*v});fx('sfx','zap')}if(e.tm>.6+n*.65+.6)e.dead=1}
  else if(e.act=='net'){if(e.tm<.8){e.x+=CL(p.x-e.x,-130*DT,130*DT);e.f=p.x<e.x?-1:1}else if(!e.n){e.n=1;e.pose='throw';G.ents.push({k:'net',x:e.x,y:e.y-14,vy:30})}if(e.tm>1.7)e.dead=1}}
 // ---------- the boss: outsmart Gargamel & Azrael
-function stepBossCat(G,e,S){const p=G.p,B=G.boss;e.tm+=DT;e.cd-=DT;
+function stepBossCat(G,e,S,stomp){const p=G.p,B=G.boss;e.tm+=DT;e.cd-=DT;
  if(e.st=='yarn'||e.st=='sit'){const y=G.ents.find(q=>q.k=='yarn');if(y&&e.st=='yarn'){const d=y.x-14-e.x;e.f=Math.sign(y.x-e.x)||1;if(Math.abs(d)>2)e.x+=Math.sign(d)*70*DT;if(e.tm>.5&&Math.abs(d)<4){y.vx+=(Math.sin(G.t*3)>0?1:-1)*0;}}return}
  if(e.st=='chase'){const dx=p.x-e.x;e.f=Math.sign(dx)||e.f;e.x+=CL(dx,-1,1)*58*S*DT;e.x=CL(e.x,8,248);if(Math.abs(dx)<52&&p.y>GY-62&&e.cd<=0&&p.inv<=0){e.st='crouch';e.tm=0;fx('sfx','hiss2')}}
  else if(e.st=='crouch'){if(e.tm>.5/S){e.st='pounce';const dx=p.x-e.x;e.vx=CL(dx/.55,-170,170);e.vy=-250;fx('sfx','meow')}}
  else if(e.st=='pounce'){e.x+=e.vx*S*DT;e.vy+=900*S*DT;e.y+=e.vy*S*DT;e.x=CL(e.x,8,248);if(e.y>=GY){e.y=GY;e.st='chase';e.cd=1.3}}
- if(p.inv<=0&&ovl(pbox(p),{x:e.x-9,y:e.y-12,w:18,h:10}))hurt(G,'cat')}
+ if(stomp&&stomp(e,e.x-9,e.y-12,18,10))return;if(p.inv<=0&&ovl(pbox(p),{x:e.x-9,y:e.y-12,w:18,h:10}))hurt(G,'cat')}
 function stepBoss(G,S){const B=G.boss,p=G.p,pb=pbox(p);B.pt-=DT;if(B.pt<=0)B.pose='';
  B.L.forEach((l,i)=>{if(!B.lev[i]&&ovl(pb,{x:l.x-4,y:l.y,w:8,h:9})){B.lev[i]=1;addScore(G,500,l.x,l.y-6);fx('sfx','lever');
   if(i==0){G.ents.push({k:'yarn',x:l.x,y:20,vx:55,vy:0});const c=G.ents.find(e=>e.k=='bcat');if(c){c.st='yarn';c.tm=0}fx('banner','A ball of yarn! Azrael can\u2019t resist it!','#f08a24')}

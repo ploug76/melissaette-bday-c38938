@@ -60,6 +60,7 @@ function runFX(){for(const a of FXQ){const k=a[0];
  if(k=='sfx'){if(SFX[a[1]])SFX[a[1]]()}else if(k=='pop')POPS.push({s:a[1],x:a[2],y:a[3],col:a[4],t:0});
  else if(k=='banner')setBanner(a[1],a[2]);
  else if(k=='dust'){for(let i=0;i<4;i++)part(a[1],a[2]-1,(Math.random()-.5)*40,-Math.random()*20,'#e6ce80',.35,2,60)}
+ else if(k=='poof'){for(let i=0;i<10;i++)part(a[1],a[2],(Math.random()-.5)*80,(Math.random()-.7)*70,['#fff','#e8e8e8','#ffd84a'][i%3],.4,2,80)}
  else if(k=='spark'){for(let i=0;i<10;i++)part(a[1],a[2],(Math.random()-.5)*90,(Math.random()-.8)*90,['#fff','#ffd84a','#42ebf5'][i%3],.6,2,120)}
  else if(k=='splashfx'){for(let i=0;i<14;i++)part(a[1],GY+4,(Math.random()-.5)*80,-60-Math.random()*90,'#42ebf5',.8,2,300);SFX.splash()}
  else if(k=='candle'){const id=a[1];if(!foundEver.includes(id)){foundEver.push(id);ST.set('candles',foundEver);if(foundEver.length==TOTAL_CANDLES)setBanner('ALL 54 CANDLES! A birthday surprise awaits!','#ff86a6');else setBanner(`Birthday candle ${foundEver.length} of 54!`,'#ff86a6')}SFX.candle();for(let i=0;i<14;i++)part(a[2],a[3]-12,(Math.random()-.5)*80,(Math.random()-.9)*80,['#ffb020','#fff6a0','#ff86a6'][i%3],.7,2,90)}
