@@ -28,4 +28,6 @@ share.apply(REPO,p)
 s=open(p,encoding='utf-8').read();assert 'Peter&#39;s Arcade' not in s and "Peter's Arcade" not in s,'arcade text leaked';print('meta+dock ok')
 PY
 fi
+# central leaderboard (shared Firestore board, same as J Woo's)
+PALB_CONFIG_FILE=/workspace/leaderboard/config.firestore.js PALB_TITLE="Melissaette" python3 /workspace/leaderboard/inject.py melissaette-bday-c38938 $D/index.html
 echo built
