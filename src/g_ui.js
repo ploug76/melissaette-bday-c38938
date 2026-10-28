@@ -50,7 +50,7 @@ function dimAll(a){g.fillStyle=`rgba(8,4,24,${a})`;g.fillRect(0,0,VW,VH)}
 function domRects(){const out=[];for(const id of ['pause','mute','help']){const e=$(id);if(getComputedStyle(e).display=='none')continue;const r=e.getBoundingClientRect();out.push({k:'dom:'+id,x:r.left,y:r.top,w:r.width,h:r.height})}return out}
 function drawTitle(){const L=LY;dimAll(.35);const cx=L.L+L.aw/2,best=ST.get('best',0);
  const two=!L.portrait;const colW=two?L.aw/2-16:L.aw-24;const lx=two?L.L+L.aw/4+4:cx;let y=L.T+(two?62:70);
- const s1=fitSize("MELISSAETTE",two?30:36,colW),s2t="Rescue in Gargamel's Castle",s2=fitSize(s2t,two?16:18,colW);
+ const s1=fitSize("MELISSAETTE",two?30:36,colW),s2t="The Great Birthday Rescue",s2=fitSize(s2t,two?16:18,colW);
  txt("MELISSAETTE",lx,y+s1/2,s1,'#ffd84a','center',{stroke:6,sc:'#1b1440'});reg('title1',lx-colW/2,y,colW,s1);y+=s1+4;
  txt(s2t,lx,y+s2/2,s2,'#fff','center',{stroke:5,sc:'#5455ed'});reg('title2',lx-colW/2,y,colW,s2);y+=s2+8;
  const ded='For Melissa — Happy 54th Birthday 🎂',ds=fitSize(ded,16,colW);rr(lx-colW/2,y,colW,ds+12,10,'rgba(255,134,166,.25)','#ff86a6',1.5);txt(ded,lx,y+(ds+12)/2+1,ds,'#ffd0de');reg('dedication',lx-colW/2,y,colW,ds+12);y+=ds+20;

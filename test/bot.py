@@ -11,7 +11,7 @@ async def main():
     for sk,rd in RUNS:
       r=await pg.evaluate(f"()=>__T.botPlay({sk},{rd})")
       bad=[o for o in r['out'] if not o['ok']]
-      print(f"skill {r['skill']:9s} round {rd}: screens {r['cleared']}/{r['screens']} rescued PapaSmurf={r['won']} friends {r['friends']}/7 score {r['score']} deterministic={r['detAll']} {r['ms']/1000:.1f}s",('FAIL '+json.dumps(bad)) if bad else '',flush=True)
+      print(f"skill {r['skill']:9s} round {rd}: screens {r['cleared']}/{r['screens']} rescued GrannyHoot={r['won']} friends {r['friends']}/7 score {r['score']} deterministic={r['detAll']} {r['ms']/1000:.1f}s",('FAIL '+json.dumps(bad)) if bad else '',flush=True)
       if not r['won'] or r['friends']<7 or not r['detAll']:fails+=1
     if '--candles' in sys.argv or '--quick' not in sys.argv:
       c=await pg.evaluate("()=>__T.candleProof(2)")

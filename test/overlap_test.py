@@ -1,4 +1,4 @@
-# Melissaette (Rescue in Gargamel's Castle): overlap + safety test. Every HUD pill, lane banner, control button, popup, menu button and DOM
+# Melissaette (The Great Birthday Rescue): overlap + safety test. Every HUD pill, lane banner, control button, popup, menu button and DOM
 # button registers its rect each frame (UIE). Asserts no two overlap, all stay inside the safe area, the Share/Install
 # dock never touches a canvas button, and no JS errors. The search bot plays the whole journey IN the live game (rendering,
 # banners, popups) while this checks every few frames; plus title / pause / game over / parade / cake.
@@ -37,7 +37,7 @@ async def main():
                      ('cakeReplay',"__T.toTitle();__T.toCake(true);__T.setSceneT(5);__T.step(3)")]:
         bad+=await pg.evaluate(f"()=>{{{act};return __CHECK('{nm}')}}")
         bad+=await pg.evaluate(f"()=>{{const n=__T.layout().els.filter(e=>e.k.startsWith('btn:')).length;return n?[]:['{nm} has no buttons']}}")
-      line=f"{w}x{h}{' safe' if safe else ''}: bot played {r['frames']} frames, reached screen {r['ri']+1}, rescued PapaSmurf={r['won']}, friends {r['friends']}/7, score {r['score']}, stress popups {r['pops']}"
+      line=f"{w}x{h}{' safe' if safe else ''}: bot played {r['frames']} frames, reached screen {r['ri']+1}, rescued GrannyHoot={r['won']}, friends {r['friends']}/7, score {r['score']}, stress popups {r['pops']}"
       print(line,'| overlaps',len(bad),bad[:6],flush=True)
       if errs:print('  JS ERRORS',errs[:5])
       tot+=len(bad);errsAll+=errs;await ctx.close()

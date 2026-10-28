@@ -108,9 +108,9 @@ function step(G,IN){G.gt+=DT;const p=G.p;
   else{const L=[CL(p.x+14,24,236),143],Sx=[FW+16,22],E=[-24,40];G.ents.push({k:'hawk',t0:G.t,T:2.5,S:Sx,C:[2*L[0]-(Sx[0]+E[0])/2,2*L[1]-(Sx[1]+E[1])/2],E,x:Sx[0],y:Sx[1]});fx('sfx','hawk')}}}
  // villain events
  for(const ev of G.evs){if(ev.done||p.x<ev.trig)continue;ev.done=1;
-  if(ev.k=='pounce'){G.ents.push({k:'cat',x:-18,y:GY,vx:125,vy:0,st:'run',tm:0});fx('sfx','meow');fx('banner','Here comes Azrael the cat!','#f08a24')}
+  if(ev.k=='pounce'){G.ents.push({k:'cat',x:-18,y:GY,vx:125,vy:0,st:'run',tm:0});fx('sfx','chitter');fx('banner','Here comes Smudge the raccoon!','#f08a24')}
   else{const wx=ev.k=='potion'?CL(ev.a+50,40,226):ev.k=='net'?CL(p.x+30,30,226):222;G.ents.push({k:'wiz',x:wx,y:58,act:ev.k,a:ev.a,tm:0,n:0,f:-1});fx('sfx','cackle');
-   fx('banner',ev.k=='potion'?'Gargamel throws a slippery potion!':ev.k=='spell'?'Gargamel casts a spell! Duck or jump!':'Gargamel drops his net!','#c95bba')}}
+   fx('banner',ev.k=='potion'?'Baron Humbug throws a slippery potion!':ev.k=='spell'?'Baron Humbug casts a spell! Duck or jump!':'Baron Humbug drops his net!','#c95bba')}}
  // entities
  const pb=pbox(p),hit=(x,y,w,h)=>p.inv<=0&&ovl(pb,{x,y,w,h});
  // creatures: land on top while falling = stomp (creature knocked out, small bounce, no harm); any other touch still hurts
@@ -123,11 +123,11 @@ function step(G,IN){G.gt+=DT;const p=G.p;
   case 'spider':{const lowY=e.low||141,tt=((G.t*S+e.ph)%e.per)/e.per;let k=0;if(tt<.28)k=tt/.28;else if(tt<.55)k=1;else if(tt<.8)k=1-(tt-.55)/.25;e.y=e.y0+(lowY-e.y0)*k;crit(e,e.x-4,e.y-3,8,6,'spider');break}
   case 'snake':e.x+=e.dir*e.v*S*DT;if(e.x>e.x2){e.x=e.x2;e.dir=-1}if(e.x<e.x1){e.x=e.x1;e.dir=1}crit(e,e.x-8,e.y-5,16,5,'snake');break;
   case 'cat':e.tm+=DT;if(e.st=='run'){e.x+=e.vx*S*DT;if(p.x>e.x&&p.x-e.x<46){e.st='crouch';e.tm=0;fx('sfx','hiss2')}if(e.x>FW+24)e.dead=1}
-   else if(e.st=='crouch'){if(e.tm>.42/S){e.st='pounce';e.vy=-235;e.vx=150;fx('sfx','meow')}}
+   else if(e.st=='crouch'){if(e.tm>.42/S){e.st='pounce';e.vy=-235;e.vx=150;fx('sfx','chitter')}}
    else if(e.st=='pounce'){e.x+=e.vx*S*DT;e.vy+=900*S*DT;e.y+=e.vy*S*DT;if(e.y>=GY){e.y=GY;e.st='leave';e.vx=140}}
    else{e.x+=e.vx*S*DT;if(e.x>FW+24)e.dead=1}
    crit(e,e.x-9,e.y-12,18,10,'cat');break;
-  case 'dropcat':e.tm+=DT;if(e.st=='sit'&&p.x>=e.trig){e.st='paw';e.tm=0;fx('sfx','meow');G.ents.push({k:'drop',x:e.x,y:e.y,vy:0,tm:0,st:'wob',kind:ZONES[G.zi].theme=='cave'?'rock':'apple'})}
+  case 'dropcat':e.tm+=DT;if(e.st=='sit'&&p.x>=e.trig){e.st='paw';e.tm=0;fx('sfx','chitter');G.ents.push({k:'drop',x:e.x,y:e.y,vy:0,tm:0,st:'wob',kind:ZONES[G.zi].theme=='cave'?'rock':'apple'})}
    else if(e.st=='paw'&&e.tm>2.2){e.st='gone'}break;
   case 'drop':e.tm+=DT;if(e.st=='wob'){if(e.tm>.5/S){e.st='fall'}}else if(e.st=='fall'){e.vy+=600*S*DT;e.y+=e.vy*S*DT;const t=topAt(G,e.x,0);if(e.y>=t){e.y=t;e.st='broke';e.tm=0;fx('sfx','bonk')}if(hit(e.x-4,e.y-8,8,8))hurt(G,'drop')}else if(e.tm>.5)e.dead=1;break;
   case 'wiz':stepWiz(G,e,S);break;
@@ -169,19 +169,19 @@ function stepWiz(G,e,S){e.tm+=DT;const p=G.p;
  if(e.act=='potion'){if(e.tm>.55&&!e.n){e.n=1;e.pose='throw';const x0=e.x-6,y0=e.y-30,T=1,tx=e.a,ty=topAt(G,tx,0);G.ents.push({k:'potion',x:x0,y:y0,vx:(tx-x0)/T,vy:(ty-y0-.5*300*T*T)/T});fx('sfx','potion')}if(e.tm>1.8)e.dead=1}
  else if(e.act=='spell'){const n=e.a||3;const fire=Math.floor((e.tm-.6)/.65);if(e.tm>.6&&fire>=e.n&&e.n<n){e.n++;e.pose='throw';const x0=e.x-8,y0=e.y-28,tx=p.x,ty=p.y-10,d=Math.hypot(tx-x0,ty-y0)||1,v=88*S;G.ents.push({k:'orb',x:x0,y:y0,vx:(tx-x0)/d*v,vy:(ty-y0)/d*v});fx('sfx','zap')}if(e.tm>.6+n*.65+.6)e.dead=1}
  else if(e.act=='net'){if(e.tm<.8){e.x+=CL(p.x-e.x,-130*DT,130*DT);e.f=p.x<e.x?-1:1}else if(!e.n){e.n=1;e.pose='throw';G.ents.push({k:'net',x:e.x,y:e.y-14,vy:30})}if(e.tm>1.7)e.dead=1}}
-// ---------- the boss: outsmart Gargamel & Azrael
+// ---------- the boss: outsmart Baron Humbug & Smudge
 function stepBossCat(G,e,S,stomp){const p=G.p,B=G.boss;e.tm+=DT;e.cd-=DT;
  if(e.st=='yarn'||e.st=='sit'){const y=G.ents.find(q=>q.k=='yarn');if(y&&e.st=='yarn'){const d=y.x-14-e.x;e.f=Math.sign(y.x-e.x)||1;if(Math.abs(d)>2)e.x+=Math.sign(d)*70*DT;if(e.tm>.5&&Math.abs(d)<4){y.vx+=(Math.sin(G.t*3)>0?1:-1)*0;}}return}
  if(e.st=='chase'){const dx=p.x-e.x;e.f=Math.sign(dx)||e.f;e.x+=CL(dx,-1,1)*58*S*DT;e.x=CL(e.x,8,248);if(Math.abs(dx)<52&&p.y>GY-62&&e.cd<=0&&p.inv<=0){e.st='crouch';e.tm=0;fx('sfx','hiss2')}}
- else if(e.st=='crouch'){if(e.tm>.5/S){e.st='pounce';const dx=p.x-e.x;e.vx=CL(dx/.55,-170,170);e.vy=-250;fx('sfx','meow')}}
+ else if(e.st=='crouch'){if(e.tm>.5/S){e.st='pounce';const dx=p.x-e.x;e.vx=CL(dx/.55,-170,170);e.vy=-250;fx('sfx','chitter')}}
  else if(e.st=='pounce'){e.x+=e.vx*S*DT;e.vy+=900*S*DT;e.y+=e.vy*S*DT;e.x=CL(e.x,8,248);if(e.y>=GY){e.y=GY;e.st='chase';e.cd=1.3}}
  if(stomp&&stomp(e,e.x-9,e.y-12,18,10))return;if(p.inv<=0&&ovl(pbox(p),{x:e.x-9,y:e.y-12,w:18,h:10}))hurt(G,'cat')}
 function stepBoss(G,S){const B=G.boss,p=G.p,pb=pbox(p);B.pt-=DT;if(B.pt<=0)B.pose='';
  B.L.forEach((l,i)=>{if(!B.lev[i]&&ovl(pb,{x:l.x-4,y:l.y,w:8,h:9})){B.lev[i]=1;addScore(G,500,l.x,l.y-6);fx('sfx','lever');
-  if(i==0){G.ents.push({k:'yarn',x:l.x,y:20,vx:55,vy:0});const c=G.ents.find(e=>e.k=='bcat');if(c){c.st='yarn';c.tm=0}fx('banner','A ball of yarn! Azrael can\u2019t resist it!','#f08a24')}
-  else if(i==1){B.wand=0;B.buck=1;fx('sfx','splash');fx('banner','SPLASH! Gargamel dropped his wand!','#42ebf5')}
-  else{B.netted=1;fx('sfx','net');fx('banner','Ha! Gargamel is caught in his own net!','#5edc78')}
-  if(B.lev.every(v=>v)){B.unlocked=1;B.netted=1;const c=G.ents.find(e=>e.k=='bcat');if(c){c.st='sit'}fx('sfx','win');fx('banner','The cage is unlocked! Climb up to Papa Smurf!','#ffd84a')}}});
+  if(i==0){G.ents.push({k:'yarn',x:l.x,y:20,vx:55,vy:0});const c=G.ents.find(e=>e.k=='bcat');if(c){c.st='yarn';c.tm=0}fx('banner','A ball of yarn! Smudge can\u2019t resist it!','#f08a24')}
+  else if(i==1){B.wand=0;B.buck=1;fx('sfx','splash');fx('banner','SPLASH! Baron Humbug dropped his wand!','#42ebf5')}
+  else{B.netted=1;fx('sfx','net');fx('banner','Ha! Baron Humbug is caught in his own net!','#5edc78')}
+  if(B.lev.every(v=>v)){B.unlocked=1;B.netted=1;const c=G.ents.find(e=>e.k=='bcat');if(c){c.st='sit'}fx('sfx','win');fx('banner','The cage is unlocked! Climb up to Granny Hoot!','#ffd84a')}}});
  if(B.netted)B.netY=Math.min(B.wy-30,B.netY+120*DT);
  if(B.netted)return;
  B.atk-=DT*S;if(B.atk<=0){const gentle=!SK[G.skill].vill;B.n++;B.pose='throw';B.pt=.4;
@@ -189,4 +189,4 @@ function stepBoss(G,S){const B=G.boss,p=G.p,pb=pbox(p);B.pt-=DT;if(B.pt<=0)B.pos
   else{const x0=B.wx,y0=B.wy-30,T=1.1,tx=CL(p.x,10,246);G.ents.push({k:'potion',x:x0,y:y0,vx:(tx-x0)/T,vy:(p.y-y0-.5*300*T*T)/T});fx('sfx','potion')}
   B.atk=gentle?4.2:B.wand?2.5:3.3;if(Math.random()<.3&&!SIM)fx('sfx','cackle')}}
 function stepBossAnim(G){const B=G.boss;if(B)B.netY=Math.min(B.wy-30,B.netY+120*DT)}
-function finalRescue(G){G.friends.push(6);addScore(G,10000,236,20,'#ffd84a');G.ph='win';G.pht=0;fx('sfx','win');fx('friend',6,236,62);fx('banner','You rescued Papa Smurf! Hooray, Melissaette!','#ffd84a')}
+function finalRescue(G){G.friends.push(6);addScore(G,10000,236,20,'#ffd84a');G.ph='win';G.pht=0;fx('sfx','win');fx('friend',6,236,62);fx('banner','You rescued Granny Hoot! Hooray, Melissaette!','#ffd84a')}

@@ -1,6 +1,17 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><!--vsettle--><script>(()=>{if(window.__vsettle)return;let P=null,L=null,busy=0;
+const probe=()=>{if(!P&&document.documentElement){P=document.createElement('div');P.id='vsProbe';P.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';document.documentElement.appendChild(P)}return P};
+const key=()=>{const p=probe();let s='';if(p){const c=getComputedStyle(p);s=c.paddingTop+','+c.paddingRight+','+c.paddingBottom+','+c.paddingLeft}return innerWidth+'x'+innerHeight+'@'+devicePixelRatio+'|'+s};
+const fire=()=>{L=key();busy=1;try{dispatchEvent(new Event('resize'))}catch(e){}busy=0};
+const chk=()=>{if(L===null||!innerWidth||!innerHeight||document.hidden)return;if(key()!==L)fire()};
+const soon=()=>[60,250,600,1200,2500].forEach(t=>setTimeout(chk,t));
+const start=()=>{if(L===null){L=key();soon()}};
+addEventListener('resize',()=>{if(busy)return;if(L!==null)L=key();soon()});
+['orientationchange','pageshow','load','focus'].forEach(e=>addEventListener(e,()=>{start();soon()}));document.addEventListener('visibilitychange',()=>{if(!document.hidden)soon()});
+try{screen.orientation.addEventListener('change',soon)}catch(e){}if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(chk,60));
+start();setInterval(chk,400);
+window.__vsettle={chk,key,get last(){return L}}})()</script><!--/vsettle-->
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#1b1440"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Melissaette">
-<title>Melissaette: Rescue in Gargamel's Castle</title><meta name="robots" content="noindex,nofollow"><style>
+<title>Melissaette: The Great Birthday Rescue</title><meta name="robots" content="noindex,nofollow"><style>
 html,body{margin:0;height:100%;overflow:hidden;background:#0d0a24;touch-action:none;font-family:"Trebuchet MS","Segoe UI",sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
 canvas{display:block;position:fixed;left:0;top:0;width:100%;height:100%;touch-action:none}
 .tb{position:fixed;top:calc(6px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid #fff;color:#fff;font-size:19px;line-height:38px;display:none;z-index:3;padding:0;background:rgba(0,0,0,.55);touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}
@@ -10,7 +21,7 @@ canvas{display:block;position:fixed;left:0;top:0;width:100%;height:100%;touch-ac
 #pbox h2{margin:4px 0 8px;text-align:center;color:#5455ed}#pbox h3{margin:10px 0 4px;color:#1b1440}#pbox ul{margin:4px 0;padding-left:20px}#pbox table{border-collapse:collapse;width:100%;font-size:14px}#pbox td{border:1px solid #ddd;padding:3px 5px}
 #pclose{display:block;margin:12px auto 2px;font-size:18px;font-weight:bold;font-family:inherit;padding:9px 30px;border-radius:24px;border:3px solid #fff;background:#5455ed;color:#fff;box-shadow:0 0 0 2px #5455ed}
 </style></head><body>
-<canvas id="c" aria-label="Melissaette: Rescue in Gargamel's Castle game"></canvas>
+<canvas id="c" aria-label="Melissaette: The Great Birthday Rescue game"></canvas>
 <button id="pause" class="tb" type="button" aria-label="Pause">⏸</button><button id="mute" class="tb" type="button" aria-label="Sound on or off">🔊</button><button id="help" class="tb" type="button" aria-label="How to play">❓</button>
 <div id="panel" role="dialog" aria-modal="true"><div id="pbox"><div id="ptext"></div><button id="pclose" type="button">OK!</button></div></div>
 <script>

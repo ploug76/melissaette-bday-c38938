@@ -54,7 +54,7 @@ defSong('ghost','Ghostbusters',116,
   r:2 B4:2 B4:2 D#5:2 B4:2 C#5:2 A4:4  r:8 B4:4 B4:4`,
  `B2:16 B2:16 B2:16 B2:16 B2:16 B2:16 B2:16 B2:16`,D_POP,.075,'drive');
 SONGS.ghost.tracks[1].notes=S([[47,2],[47,2],[40,2],[42,2],[44,4],[45,2],[44,2]].concat([[47,2],[47,2],[40,2],[42,2],[44,4],[42,2],[40,2]]));
-// Land 8 (Gargamel's lab, the boss) — Danger Zone (Kenny Loggins, Top Gun), D minor-ish: verse + chorus over the C-D-F-G riff.
+// Land 8 (Humbug's lab, the boss) — Danger Zone (Kenny Loggins, Top Gun), D minor-ish: verse + chorus over the C-D-F-G riff.
 defSong('danger','Danger Zone',152,
  `F5:2 F5:2 F5:2 F5:2 E5:2 D5:2 C5:2 C5:2  D5:8 r:8
   G5:8 F5:8  E5:6 C5:4 D5:6
