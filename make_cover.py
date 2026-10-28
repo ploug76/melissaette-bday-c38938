@@ -52,7 +52,7 @@ def frame(t=0):
   for i,c in enumerate(cols):R(d,0,i*6,W,6,c);R(d,0,H-42+i*6,W,6,c)
   side=528;ax,ay=36,52;R(d,ax-8,ay-8,side+16,side+16,'#ffffff');R(d,ax-4,ay-4,side+8,side+8,'#d4524d')
   im.paste(left_panel(side,max(t,0)),(ax,ay))
-  tl='MELISSAETTE';sc=8;text(d,px+(PW-tw(tl,sc))//2,76,tl,'#ffd84a',sc,shadow='#c95bba')
+  tl='MELISSA TIME';sc=7;text(d,px+(PW-tw(tl,sc))//2,80,tl,'#ffd84a',sc,shadow='#c95bba')
   t2="A BIRTHDAY ADVENTURE";sc2=3;text(d,px+(PW-tw(t2,sc2))//2,150,t2,'#ffffff',sc2,shadow='#5455ed')
   # birthday banner ribbon across the bottom
   b='HAPPY 54TH BIRTHDAY, MELISSA!';sb=5;bw=tw(b,sb)+48;bx=(W-bw)//2;by=516

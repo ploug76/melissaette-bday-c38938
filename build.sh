@@ -9,8 +9,8 @@ python3 - <<'PY'
 import sys,html,re
 sys.path.insert(0,'/workspace/launch')
 import share
-REPO='melissaette-bday-c38938';URL=f'https://ploug76.github.io/{REPO}/';IMG=URL+'cover.png?v=5'
-T="Melissaette: The Great Birthday Rescue"
+REPO='melissaette-bday-c38938';URL=f'https://ploug76.github.io/{REPO}/';IMG=URL+'cover.png?v=6'
+T="Melissa Time: The Great Birthday Rescue"
 DESC="Happy 54th Birthday, Melissa! 🎂 A birthday game made just for you: guide Melissaette past grumpy Baron Humbug and his raccoon Smudge to rescue her woodland Party Pals to an 8-bit 80s movie soundtrack, and find all 54 hidden candles."
 e=lambda s:html.escape(s,quote=True)
 tags=(f'<!--og--><meta name="robots" content="noindex,nofollow"><meta name="description" content="{e(DESC)}">'
@@ -23,11 +23,11 @@ tags=(f'<!--og--><meta name="robots" content="noindex,nofollow"><meta name="desc
 p='/workspace/melissaette-bday-c38938/index.html';s=open(p,encoding='utf-8').read()
 s=re.sub(r'<meta name="robots"[^>]*>','',s)
 s=re.sub(r'<!--og-->.*?<!--/og-->','',s,flags=re.S);s=s.replace('</title>','</title>'+tags,1);open(p,'w',encoding='utf-8').write(s)
-share.cfg(REPO,d=REPO,url=URL,title=T,text="Happy 54th Birthday, Melissa! 🎂 Play Melissaette: The Great Birthday Rescue.")
+share.cfg(REPO,d=REPO,url=URL,title=T,text="Happy 54th Birthday, Melissa! 🎂 Play Melissa Time: The Great Birthday Rescue.")
 share.apply(REPO,p)
 s=open(p,encoding='utf-8').read();assert 'Peter&#39;s Arcade' not in s and "Peter's Arcade" not in s,'arcade text leaked';print('meta+dock ok')
 PY
 fi
 # central leaderboard (shared Firestore board, same as J Woo's)
-PALB_CONFIG_FILE=/workspace/leaderboard/config.firestore.js PALB_TITLE="Melissaette" python3 /workspace/leaderboard/inject.py melissaette-bday-c38938 $D/index.html
+PALB_CONFIG_FILE=/workspace/leaderboard/config.firestore.js PALB_TITLE="Melissa Time" python3 /workspace/leaderboard/inject.py melissaette-bday-c38938 $D/index.html
 echo built

@@ -36,7 +36,7 @@ def main():
   # title block
   R(d,0,0,S,128,'#000000')
   for i,col in enumerate(['#d4524d','#ffb020','#ffd84a','#21c842','#42ebf5','#5455ed','#c95bba']):R(d,0,128+i*3,S,3,col)
-  t='MELISSAETTE';sc=7;gen.text(d,(S-tw(t,sc))//2,18,t,'#ffd84a',sc,shadow='#c95bba')
+  t='MELISSA TIME';sc=7;gen.text(d,(S-tw(t,sc))//2,18,t,'#ffd84a',sc,shadow='#c95bba')
   t='THE GREAT BIRTHDAY RESCUE';sc=3;gen.text(d,(S-tw(t,sc))//2,88,t,'#ffffff',sc,shadow='#5455ed')
   im.save(D+'title.jpg',quality=90);print('title ok')
 main()
