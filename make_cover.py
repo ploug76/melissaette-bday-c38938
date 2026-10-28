@@ -1,7 +1,7 @@
 # Builds cover.png (1200x630, ColecoVision-box style) + cover-anim.gif. Imports shared covers/gen.py read-only.
 import sys;sys.path.insert(0,'/workspace/covers');sys.path.insert(0,'/workspace/melissaette-bday-c38938')
 from PIL import Image,ImageDraw
-import gen,tools_sprite as ts
+import gen
 F=gen.F;F2=dict(F);F2[',']=['..','..','..','..','.#','.#','#.']
 def text(d,x,y,s,col,sc,shadow=None):
   old=gen.F;gen.F=F2
