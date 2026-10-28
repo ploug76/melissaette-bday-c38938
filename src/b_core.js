@@ -72,7 +72,7 @@ const SFX={
  hawk(){tone(1800,.35,'sawtooth',.05,900)},
  hiss(){noise(.35,.12,5000,.8,'highpass')},
  cackle(){[0,1,2,3,4].forEach(i=>tone(520-i*30,.07,'sawtooth',.06,380-i*30,i*.09))},
- meow(){tone(600,.14,'triangle',.1,950);tone(950,.22,'triangle',.09,520,.13)},
+ chitter(){[0,.06,.12,.18].forEach((d,i)=>tone(1100+(i%2)*260,.05,'square',.06,1400,d))},
  hiss2(){noise(.3,.15,3500,1,'highpass')},
  potion(){tone(500,.25,'sine',.08,1200)},
  slosh(){noise(.3,.25,900,.8,'lowpass',0,300);tone(200,.2,'sine',.08,90)},

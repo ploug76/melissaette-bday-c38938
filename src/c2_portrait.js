@@ -1,5 +1,5 @@
 // ---------- Melissaette big portrait (vector, cartoon outline style) for the title, ending and cover.
-// Drawn likeness of Melissa as a little blue forest-folk girl: big curly auburn 80s hair with a fringe, defined brows,
+// Drawn likeness of Melissa as a cheerful 80s girl: big curly auburn 80s hair with a fringe, defined brows,
 // blue-grey eyes, dark red lips, gold hoop earrings, black bead necklace, pink floral dress with a black belt.
 // (cx,by) = bottom centre (feet), h = full height in current units. mood: 'smile' | 'happy' | 'wave'
 function drawMelPortrait(cx,by,h,mood='smile',t=0){const u=h/100,K='#1a1238';g.save();g.translate(cx,by);g.scale(u,u);g.lineJoin='round';g.lineCap='round';
@@ -7,7 +7,7 @@ function drawMelPortrait(cx,by,h,mood='smile',t=0){const u=h/100,K='#1a1238';g.s
  const E=(x,y,rx,ry,fill,lw=2.4,rot=0)=>{g.beginPath();g.ellipse(x,y,rx,ry,rot,0,Math.PI*2);if(fill){g.fillStyle=fill;g.fill()}if(lw){g.strokeStyle=K;g.lineWidth=lw;g.stroke()}};
  const L=(pts,col,lw)=>{P(pts,null,0,false);g.strokeStyle=col;g.lineWidth=lw;g.stroke()};
  const wave=mood=='wave'||mood=='happy'?Math.sin(t*7)*8:0,happy=mood=='happy'||mood=='wave',closed=mood=='happy',sway=Math.sin(t*2.2)*0.8;
- const HAIR='#a8532a',HS='#6e2e16',HL='#d98a4e',SKIN='#5aa2ff',SK2='#3c7fe0',DRESS='#fbd6e0',DS='#e9a9bd',GOLD='#f2c230',GOLD2='#b8861a',LIP='#a3122c';
+ const HAIR='#a8532a',HS='#6e2e16',HL='#d98a4e',SKIN='#f6c9a4',SK2='#dc9a78',DRESS='#fbd6e0',DS='#e9a9bd',GOLD='#f2c230',GOLD2='#b8861a',LIP='#a3122c';
  // scalloped outline helper: walks a contour and bulges each segment outward into a curl
  const scal=(pts,bump,fill,lw=2.4,close=true)=>{const n=pts.length;g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<=(close?n:n-1);i++){const A=pts[i-1],B=pts[i%n],mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2,dx=B[0]-A[0],dy=B[1]-A[1],l=Math.hypot(dx,dy)||1,bb=B[2]===undefined?bump:B[2];g.quadraticCurveTo(mx+dy/l*bb,my-dx/l*bb,B[0],B[1])}if(close)g.closePath();if(fill){g.fillStyle=fill;g.fill()}if(lw){g.strokeStyle=K;g.lineWidth=lw;g.stroke()}};
  // big wavy-curly back hair (80s volume, past the shoulders)

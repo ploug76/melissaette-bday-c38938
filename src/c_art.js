@@ -6,102 +6,96 @@ const SPR={};
 function mk(rows,pal){const w=Math.max(...rows.map(r=>r.length)),h=rows.length,cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');
  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){const ch=r[i];if(ch=='.'||ch==' ')continue;const col=pal[ch];if(!col)continue;x.fillStyle=col;x.fillRect(i,j,1,1)}});return cv}
 function flipC(cv){const o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;const x=o.getContext('2d');x.translate(cv.width,0);x.scale(-1,1);x.drawImage(cv,0,0);return o}
-// little blue forest folk (Melissaette + friends): front 3/4 view, facing right; mirrored for left
-const HEAD=[
-"......kkkk......",
-"...kkkhhhhkkk...",
-"..khhhhhhhhhhk..",
-".khhhhhhhhhhhhk.",
-"khhhhhhhhhhhhhhk",
-"kHHkkkkkkkkkkHHk",
-".kkyyyyyyyyyykk.",
-".kyybbbbbbbbyyk.",
-"kyybwwbbbbwwbyyk",
-"kyybwkbbbbwkbyyk",
-"kyybbbbddbbbbyyk",
-"kyybpbbbbbbpbyyk",
-"kyyybbbkkbbbyyyk",
-"kyyyykbbbbkyyyyk"];
-const BODY=[
-"kyyykwwwwwwkyyyk",
-"kyyybwwwwwwbyyk.",
-".kyybwwwwwwbyk..",
-"..kkkwwwwwwkkk..",
-"...kwwwwwwwwk...",
-"..kwwwwwwwwwwk..",
-"..kggggggggggk..",
-"...kkkkkkkkkk..."];
-const LEGS={stand:["....kbk..kbk....","...kwwk..kwwk..."],w1:["...kbk....kbk...","..kwwk.....kwwk."],w2:[".....kbkkbk.....","....kwwkkwwk...."],jump:["...kbbk..kbbk...","...kwwk..kwwk..."]};
-const BODYJ=[
-"kyyykwwwwwwkyyyk",
-"bbyykwwwwwwkyybb",
-".kbbkwwwwwwkbbk.",
-"..kkkwwwwwwkkk..",
-"...kwwwwwwwwk...",
-"..kwwwwwwwwwwk..",
-"..kggggggggggk..",
-"...kkkkkkkkkk..."];
-function folkPal(o){return Object.assign({k:'#141030',h:'#ffffff',H:'#c4cde6',y:'#ffd84a',b:'#4d8df6',d:'#2f62c9',w:'#ffffff',g:'#c4cde6',p:'#ff86a6'},o)}
-const SM={e:'#ffffff',k:'#141030',h:'#ffffff',H:'#c4cde6',y:'#4d8df6',b:'#4d8df6',d:'#2f62c9',w:'#ffffff',g:'#c4cde6',p:'#3a74e0',r:'#e02a2a',a:'#ffd84a',f:'#ff86a6'};
-const FOLK={mel:folkPal({}),brainy:{...SM},hefty:{...SM},clumsy:{...SM},handy:{...SM},jokey:{...SM},vanity:{...SM},papa:{...SM,h:'#e02a2a',H:'#a01818',w:'#e02a2a',g:'#a01818'}};
-const OLDFOLK={
- pip:folkPal({h:'#e0403a',H:'#9c2420',y:'#8a5426',w:'#f2e6c8',g:'#c9b48a'}),
- clover:folkPal({h:'#3fbf4a',H:'#22803a',y:'#5a3a1a',w:'#ffe39a',g:'#d4b860'}),
- juniper:folkPal({h:'#9a5cd6',H:'#64349c',y:'#2a2a2a',w:'#e8d8ff',g:'#b8a2e0'}),
- bramble:{...folkPal({h:'#9a6a3a',H:'#6a4422',y:'#d07a2a',w:'#cfe8ff',g:'#9ab8d8'})},
- poppy:folkPal({h:'#ffb020',H:'#c87a10',y:'#e04a8a',w:'#ffd0e0',g:'#e0a0b8'}),
- thistle:folkPal({h:'#9aa0b0',H:'#6a7080',y:'#e8e8e8',w:'#ffffff',g:'#c4cde6'}),
- wren:folkPal({h:'#ff6fae',H:'#c43e7a',y:'#f2a33a',w:'#ffffff',g:'#ffc4de'})};
-const FRIENDS=[['brainy','Brainy Smurf'],['hefty','Hefty Smurf'],['clumsy','Clumsy Smurf'],['handy','Handy Smurf'],['jokey','Jokey Smurf'],['vanity','Vanity Smurf'],['papa','Papa Smurf']];
-// male Smurfs: Phrygian hat flopping forward, bare blue chest, white trousers
-const SHAT=["....kkkkkk......","..kkhhhhhhkkk...",".khhhhhhhhhhhkk.","khhhhhhhhhhhhhhk","khhhhhhhhhhhhkhk","kHHkkkkkkkkkkkHk"];
-const SBODY=["...kkbbbbbbkk...","..kbbbbbbbbbbk..",".kbkbbbbbbbbkbk.",".kbkbbbbbbbbkbk.","..kkkwwwwwwkkk..","...kwwwwwwwwk...","...kwgwwwwgwk...","...kkkkkkkkkk..."];
-const SBODYJ=["...kkbbbbbbkk...","bbkbbbbbbbbbbkbb",".kbkbbbbbbbbkbk.","..kkbbbbbbbbkk..","..kkkwwwwwwkkk..","...kwwwwwwwwk...","...kwgwwwwgwk...","...kkkkkkkkkk..."];
-function smurfRows(id,body,legs){const hd=SHAT.concat(HEAD.slice(6)).map(r=>r);const L=legs.map(r=>r.replace(/b/g,'w'));let rows=hd.concat(body,L);
- const set=(j,i,ch)=>{rows[j]=rows[j].slice(0,i)+ch+rows[j].slice(i+1)};
- if(id=='brainy'){rows[8]="kbbkwwkkkkwwkbbk";rows[9]="kbbkwkkbbkwkkbbk"}
- if(id=='hefty'){set(16,2,'r');set(16,3,'r')}
- if(id=='handy'){set(5,13,'a');set(4,14,'a')}
- if(id=='vanity'){set(2,4,'f');set(1,5,'f');set(2,6,'f');set(3,5,'a')}
- if(id=='clumsy'){set(10,7,'k');set(10,8,'k')}
- if(id=='papa'){rows[11]="kbbbeeeeeeeebbbk";rows[12]="kbbeeeekkeeeebbk";rows[13]="kbbbeeeeeeeebbbk";rows[14]="...kkeeeeeekk...";rows[15]="..kbbkeeeekbbk.."}
- return rows}
+// ---------- the Party Pals: Melissaette's seven woodland friends (original critter designs), 16x24, facing right; mirrored for left
+const FRIENDS=[['pip','Pip the Bunny'],['clover','Clover the Hedgehog'],['juniper','Juniper the Fox'],['bramble','Bramble the Badger'],['poppy','Poppy the Mouse'],['thistle','Thistle the Frog'],['hoot','Granny Hoot the Owl']];
+const PALPAL={
+ pip:{a:'#f1e8dc',A:'#c8b6a0',c:'#ffffff',p:'#ff9ab8',r:'#5aa2ff',n:'#ff6f9f'},
+ clover:{a:'#e7c49a',A:'#7a4a22',c:'#f6e2c4',p:'#ff9ab8',r:'#3fbf4a',n:'#2a1a1a'},
+ juniper:{a:'#f08a24',A:'#6e3412',c:'#fff4e6',p:'#ff9ab8',r:'#ffd84a',n:'#2a1a1a'},
+ bramble:{a:'#8c8c98',A:'#2a2a34',c:'#f4f4f4',p:'#ff9ab8',r:'#c95bba',n:'#2a1a1a'},
+ poppy:{a:'#b9a9c9',A:'#8a7a9a',c:'#f3eaf6',p:'#ff8fb0',r:'#ff5f8f',n:'#ff6f9f'},
+ thistle:{a:'#5edc78',A:'#21a03b',c:'#e8f7c0',p:'#ff8fb0',r:'#c95bba',n:'#21a03b'},
+ hoot:{a:'#9a6a3a',A:'#6a4422',c:'#f2e2c4',p:'#ff9ab8',r:'#b48ae0',n:'#f2a33a',g:'#ffd84a'}};
+function palRows(id,fr){const W=16,H=24,G=[...Array(H)].map(()=>Array(W).fill('.'));
+ const put=(x,y,c)=>{if(x>=0&&x<W&&y>=0&&y<H)G[y][x]=c};
+ const ell=(cx,cy,rx,ry,c)=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(((x+.5-cx)/rx)**2+((y+.5-cy)/ry)**2<=1)put(x,y,c)};
+ const rect=(x0,y0,x1,y1,c)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)put(x,y,c)};
+ const up=fr=='jump'||fr=='happy'||fr=='hurt';
+ // tails / backs drawn first (behind the body)
+ if(id=='pip')ell(3,18.5,1.8,1.8,'c');
+ if(id=='juniper'){ell(2.6,16.5,2.2,3.6,'a');rect(1,19,3,20,'c')}
+ if(id=='poppy'){for(const [x,y] of [[3,20],[2,20],[1,19],[1,18],[1,17],[2,16]])put(x,y,'p')}
+ if(id=='clover'){ell(6.6,16,5.4,5,'A');ell(6.4,10,6.6,5.6,'A');for(const [x,y] of [[1,8],[2,5],[4,3],[6,3],[8,3],[10,4],[1,12],[0,15],[1,19]])put(x,y,'A')}
+ // ears / top features
+ if(id=='pip'){for(let y=0;y<=6;y++){put(4,y,'a');put(5,y,y>0&&y<6?'p':'a');put(10,y,y>0&&y<6?'p':'a');put(11,y,'a')}put(4,0,'.');put(11,0,'.');put(12,6,'r');put(13,5,'r');put(13,7,'r');put(14,6,'r')}
+ if(id=='juniper'){const E=[[1,[4,4]],[2,[4,5]],[3,[3,5]],[4,[3,6]],[5,[3,6]],[6,[3,6]]];for(const [y,[a,b]] of E){rect(a,y,b,y,y<3?'A':'a');rect(15-b,y,15-a,y,y<3?'A':'a')}}
+ if(id=='bramble'){ell(3.6,6.6,1.7,1.7,'A');ell(12.4,6.6,1.7,1.7,'A')}
+ if(id=='poppy'){ell(3.6,5.4,3,3,'a');ell(3.6,5.4,1.6,1.6,'p');ell(12.4,5.4,3,3,'a');ell(12.4,5.4,1.6,1.6,'p')}
+ if(id=='thistle'){ell(5,7,2.5,2.4,'a');ell(11,7,2.5,2.4,'a')}
+ if(id=='hoot'){put(3,4,'A');put(3,5,'A');put(4,5,'A');put(12,4,'A');put(12,5,'A');put(11,5,'A')}
+ // body + belly
+ ell(8,17.6,4.8,4.2,id=='clover'?'A':'a');ell(8.6,18.4,3,2.8,'c');
+ if(id=='hoot'){rect(4,14,12,15,'r');put(5,16,'r');put(11,16,'r')}
+ if(id=='bramble'){rect(4,14,12,15,'r');put(12,16,'r');put(12,17,'r')}
+ if(id=='thistle'){put(7,14,'r');put(9,14,'r');put(8,14,'k')}
+ // head
+ if(id=='clover')ell(9.2,11,5.2,4.6,'a');else if(id=='thistle')ell(8,10.8,6.6,4.4,'a');else ell(8,10.6,6.2,5.2,id=='bramble'?'c':'a');
+ if(id=='bramble'){rect(2,8,3,13,'a');rect(13,8,13,13,'a');rect(5,6,6,12,'A');rect(10,6,11,12,'A')}
+ if(id=='juniper'){ell(10.2,12.8,3.2,2.2,'c');put(3,12,'c');put(4,13,'c')}
+ if(id=='hoot'){ell(6.1,10.6,2.3,2.3,'c');ell(10.6,10.6,2.3,2.3,'c')}
+ if(id=='thistle'){put(3,11,'A');put(12,9,'A');put(6,15,'A')}
+ // arms + feet
+ const arm=up?[[3,13],[2,12],[13,13],[14,12]]:[[3,16],[3,17],[13,16],[13,17]];for(const [x,y] of arm)put(x,y,id=='clover'?'a':(id=='thistle'?'a':'A'));
+ const F={stand:[[4,6],[9,11]],w1:[[3,5],[10,12]],w2:[[5,7],[8,10]],jump:[[4,6],[9,11]],happy:[[4,6],[9,11]],hurt:[[4,6],[9,11]]}[fr];
+ const fy=up?20:21;for(const [a,b] of F)rect(a,fy,b,fy+1,id=='thistle'?'a':'A');
+ // auto outline
+ const O=G.map(r=>r.slice());for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x]=='.'&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>G[y+dy]&&G[y+dy][x+dx]&&G[y+dy][x+dx]!='.'))O[y][x]='k';
+ const P=(x,y,c)=>{if(x>=0&&x<W&&y>=0&&y<H)O[y][x]=c};
+ // face: eyes, nose, mouth, cheeks
+ const ey=id=='thistle'?7:10,ex=id=='thistle'?[5,11]:[6,10];
+ const ec=id=='bramble'?'e':'k';
+ for(const x0 of ex){const x=id=='bramble'&&x0==6?5:x0;if(fr=='happy'){P(x,ey,ec);P(x-1,ey+1,ec);P(x+1,ey+1,ec)}else if(fr=='hurt'){P(x-1,ey-1,ec);P(x+1,ey-1,ec);P(x,ey,ec);P(x-1,ey+1,ec);P(x+1,ey+1,ec)}else if(id=='bramble'){P(x+(x0==6?1:0),ey,'e');P(x+(x0==6?1:0),ey+1,'e')}else{P(x,ey,'k');P(x,ey+1,'k');P(x+1,ey,'k');P(x+1,ey+1,'k')}}
+ if(id=='hoot'){for(const x of [6,10]){P(x-2,ey,'g');P(x+2,ey,'g')}P(8,12,'n');P(8,13,'n');P(9,12,'n')}
+ else if(id=='thistle'){for(let x=5;x<=11;x++)P(x,12,fr=='hurt'?(x%2?'k':'a'):'k');if(fr=='happy')P(8,13,'p');P(3,11,'p');P(13,11,'p')}
+ else{const nx=id=='juniper'?12:id=='clover'?12:9;P(nx,12,'n');if(id!='juniper'&&id!='clover')P(nx-1,12,'n');P(nx-1,13,fr=='hurt'?'k':(fr=='happy'?'p':'k'));P(4,12,'p');if(id!='juniper')P(12,12,'p')}
+ if(id=='poppy'){P(15,11,'k');P(15,13,'k');P(13,4,'r');P(14,3,'r');P(14,5,'r');P(15,4,'r');P(14,4,'o')}
+ if(id=='clover'){P(10,4,'r');P(11,3,'r');P(11,4,'r');P(10,3,'r');P(9,5,'A')}
+ return O.map(r=>r.join(''))}
 function buildFolk(){{const o={},L={};for(const k in MELF){o[k]=mk(MELF[k],MELP);L[k]=flipC(o[k])}SPR.mel={r:o,l:L}}
- for(const [id,pal] of Object.entries(FOLK)){if(id=='mel')continue;const P2=Object.assign({},pal),o={};const male=id!='mel';
-  if(id=='papa'){P2.h='#e02a2a';P2.H='#a01818'}
-  for(const [fr,lg] of Object.entries(LEGS)){const rows=male?smurfRows(id,fr=='jump'?SBODYJ:SBODY,lg):HEAD.concat(fr=='jump'?BODYJ:BODY,lg);o[fr]=mk(rows,P2)}
-  // happy (eyes closed ^^) and hurt (x eyes) heads
-  const base=male?smurfRows(id,SBODYJ,LEGS.jump):null;if(male){const hh=base.slice();hh[8]="kbbbbbbbbbbbbbbk";hh[9]="kbbbkkbbbbkkbbbk";if(id!='papa')hh[12]="kbbbbbkkkkbbbbbk";o.happy=mk(hh,P2);const hu=base.slice();hu[8]="kbbkbkbbbbkbkbbk";hu[9]="kbbbkbbbbbbkbbbk";o.hurt=mk(hu,P2);const L={};for(const k in o)L[k]=flipC(o[k]);SPR[id]={r:o,l:L};continue}
-  const hh=HEAD.slice();hh[8]="kyybbbbbbbbbbyyk";hh[9]="kyybkkbbbbkkbyyk";hh[12]="kyyybbkkkkbbyyyk";o.happy=mk(hh.concat(BODYJ,LEGS.jump),P2);
-  const hu=HEAD.slice();hu[8]="kyybkbkbbkbkbyyk";hu[9]="kyybbkbbbbkbbyyk";hu[12]="kyyybbkwwkbbyyyk";o.hurt=mk(hu.concat(BODYJ,LEGS.jump),P2);
+ for(const [id] of FRIENDS){const pal=Object.assign({k:'#1a1238',e:'#ffffff',o:'#ffd84a'},PALPAL[id]),o={};
+  for(const fr of ['stand','w1','w2','jump','happy','hurt'])o[fr]=mk(palRows(id,fr),pal);
   const L={};for(const k in o)L[k]=flipC(o[k]);SPR[id]={r:o,l:L}}}
 // draw a folk sprite: anchor bottom-centre at (x,y). squash<1 = ducking
 function drawFolk(id,fr,x,y,face=1,squash=1,s=1){const sp=SPR[id][face>0?'r':'l'][fr]||SPR[id][face>0?'r':'l'].stand;const k=sp.width>16?.75:1,w=sp.width*k*s,h=sp.height*k*s*squash;g.drawImage(sp,Math.round(x-w/2),Math.round(y-h),w,h)}
 // ---------- villains & critters (blocky rect pixel art, facing right; f=-1 mirrors)
 function mir(x,w,f,ox){return f>0?x:2*ox-x-w}
-function wizard(x,y,f=1,t=0,pose=''){ // Gargamel: bald, scraggly, black patched robe, black robe; anchor bottom centre
+function wizard(x,y,f=1,t=0,pose=''){ // Baron Humbug: stout party-pooper in a tall top hat, plum tailcoat, walrus moustache + monocle; anchor bottom centre
  const B=(dx,dy,w,h,col)=>R(mir(x+dx,w,f,x),y+dy,w,h,col);const bob=Math.round(Math.sin(t*6)*1);
- B(-9,-2,18,2,'#0c0a18');B(-9,-2,7,2,'#c8262a');B(3,-2,7,2,'#c8262a'); // robe hem + Gargamel's red shoes
- B(-8,-22,16,20,'#231f36');B(-7,-21,3,18,'#3a3458');B(2,-21,2,18,'#16131f'); // robe
- B(-5,-14,10,2,'#8a1f3a');                          // sash
- B(-9,-20,3,8,'#231f36');B(6,-20,4,8,'#231f36');     // sleeves
- B(-10,-13,3,3,'#e8b48c');B(8,-13,3,3,'#e8b48c');    // hands
- if(pose=='throw'){B(8,-26,3,8,'#231f36');B(9,-29,3,3,'#e8b48c')}
- B(-6,-34+bob,12,12,'#e8b48c');B(-6,-34+bob,12,2,'#f6cfa8');                 // bald head
- B(-8,-29+bob,3,4,'#9a9a9a');B(5,-29+bob,3,4,'#9a9a9a');B(-9,-27+bob,2,3,'#7a7a7a');B(7,-27+bob,2,3,'#7a7a7a'); // scraggly side hair
- B(-4,-30+bob,4,1,'#4a2a1a');B(1,-30+bob,4,1,'#4a2a1a');                    // brows
- B(-3,-29+bob,2,2,'#ffffff');B(2,-29+bob,2,2,'#ffffff');B(-2,-28+bob,1,1,'#000');B(3,-28+bob,1,1,'#000');
- B(3,-27+bob,4,4,'#d48a6a');                                                 // big nose
- B(-3,-24+bob,6,1,'#5a1a1a');B(-2,-23+bob,1,1,'#ffffff')}                    // grumpy mouth + snaggle tooth
-function cat(x,y,f=1,t=0,pose='run'){ // orange tabby, anchor bottom centre, ~20x12
- const B=(dx,dy,w,h,col)=>R(mir(x+dx,w,f,x),y+dy,w,h,col);const o='#f08a24',s='#b8560e',cr='#ffd9a0';
+ B(-8,-2,7,2,'#1a1a22');B(2,-2,7,2,'#1a1a22');                         // black buttoned boots
+ B(-6,-8,5,6,'#6a6f7e');B(2,-8,5,6,'#6a6f7e');B(-5,-8,1,6,'#4a4e5c');B(3,-8,1,6,'#4a4e5c'); // grey striped trousers
+ B(-10,-24,20,17,'#6a2a6e');B(-10,-10,4,4,'#6a2a6e');B(6,-10,4,4,'#6a2a6e');        // plum tailcoat (round belly)
+ B(-3,-24,6,15,'#e8d8a0');B(-1,-22,2,2,'#ffd84a');B(-1,-17,2,2,'#ffd84a');B(-1,-12,2,2,'#ffd84a'); // waistcoat + gold buttons
+ B(-11,-22,3,9,'#4e1e52');B(8,-22,3,9,'#4e1e52');                       // sleeves
+ B(-11,-13,3,3,'#f0c8a0');B(8,-13,3,3,'#f0c8a0');                       // hands
+ if(pose=='throw'){B(8,-28,3,8,'#4e1e52');B(8,-31,3,3,'#f0c8a0')}
+ B(-6,-33+bob,12,10,'#f0c8a0');                                          // round face
+ B(-7,-26+bob,6,2,'#f4f4f4');B(1,-26+bob,6,2,'#f4f4f4');B(-8,-25+bob,2,2,'#f4f4f4');B(6,-25+bob,2,2,'#f4f4f4'); // big white walrus moustache
+ B(-1,-28+bob,3,3,'#e8907a');                                            // button nose
+ B(-4,-30+bob,2,2,'#1a1a22');B(2,-31+bob,4,4,'#ffd84a');B(3,-30+bob,2,2,'#1a1a22'); // eye + gold monocle
+ B(-5,-32+bob,3,1,'#1a1a22');B(2,-33+bob,4,1,'#1a1a22');                 // frowny brows
+ B(-8,-35+bob,16,2,'#1a1a22');B(-5,-45+bob,10,10,'#1a1a22');B(-5,-38+bob,10,2,'#8a2a8e'); // top hat with plum band
+ B(-3,-48+bob,1,3,'#cccccc');B(-4,-49+bob,3,1,'#cccccc')}                 // a snuffed-out candle wick stuck in the hat (he hates parties)
+function cat(x,y,f=1,t=0,pose='run'){ // Smudge the raccoon (Humbug's pet), anchor bottom centre, ~20x12
+ const B=(dx,dy,w,h,col)=>R(mir(x+dx,w,f,x),y+dy,w,h,col);const o='#8e8e9c',s='#3a3a46',cr='#e8e8ee',M='#22222c';
  const leg=pose=='run'?(Math.floor(t*12)%2):0;
- if(pose=='crouch'){B(-9,-6,16,5,o);B(-6,-6,2,5,s);B(-1,-6,2,5,s);B(5,-10,7,7,o);B(6,-12,2,2,o);B(10,-12,2,2,o);B(8,-8,1,1,'#2a2');B(11,-8,1,1,'#2a2');B(-14,-5+(Math.floor(t*10)%2),5,2,o);B(-9,-1,4,1,o);B(3,-1,4,1,o);return}
- if(pose=='sit'){B(-5,-10,10,10,o);B(-3,-9,2,8,s);B(1,-9,2,8,s);B(-4,-17,9,8,o);B(-4,-19,2,2,o);B(3,-19,2,2,o);B(-2,-14,1,1,'#2a2');B(2,-14,1,1,'#2a2');B(-1,-12,3,1,cr);B(5,-3,6,2,o);return}
- B(-8,-9,15,6,o);B(-5,-9,2,6,s);B(-1,-9,2,6,s);B(3,-9,2,6,s);B(-6,-4,12,1,cr);  // body + stripes
- B(6,-13,8,8,o);B(6,-15,2,2,o);B(12,-15,2,2,o);B(9,-11,1,1,'#2a2');B(12,-11,1,1,'#2a2');B(11,-8,3,1,cr);B(13,-9,1,1,'#ff8fa0'); // head
- B(-13,-11+(pose=='pounce'?2:0),5,2,o);B(-14,-13,2,2,s);                       // tail
- if(pose=='pounce'){B(-9,-3,4,2,o);B(5,-4,5,2,o)}else{B(-7+leg*2,-3,2,3,o);B(-3-leg*2,-3,2,3,o);B(2+leg*2,-3,2,3,o);B(5-leg*2,-3,2,3,o)}}
+ const tail=(tx,ty)=>{B(tx,ty,6,3,o);B(tx+1,ty,1,3,s);B(tx+4,ty,1,3,s);B(tx-1,ty,1,3,s)};
+ const head=(hx,hy)=>{B(hx,hy,9,7,o);B(hx,hy-2,2,2,s);B(hx+6,hy-2,2,2,s);B(hx,hy+2,9,2,M);B(hx+2,hy+2,1,1,cr);B(hx+6,hy+2,1,1,cr);B(hx+3,hy+5,6,2,cr);B(hx+8,hy+4,2,1,'#1a1a22')};
+ if(pose=='crouch'){B(-9,-6,15,5,o);B(-6,-6,2,5,s);tail(-15,-5+(Math.floor(t*10)%2));head(4,-11);B(-8,-1,4,1,s);B(2,-1,4,1,s);return}
+ if(pose=='sit'){B(-5,-10,10,10,o);B(-3,-8,6,7,cr);tail(5,-3);head(-4,-18);return}
+ B(-8,-9,15,6,o);B(-6,-4,12,1,cr);                                        // body
+ head(6,-14);                                                              // masked face
+ tail(-14,-11+(pose=='pounce'?2:0));
+ if(pose=='pounce'){B(-9,-3,4,2,s);B(5,-4,5,2,s)}else{B(-7+leg*2,-3,2,3,s);B(-3-leg*2,-3,2,3,s);B(2+leg*2,-3,2,3,s);B(5-leg*2,-3,2,3,s)}}
 function bat(x,y,t){const fl=Math.floor(t*14)%2;R(x-3,y-2,6,5,'#5a3a8a');R(x-2,y-1,1,1,'#ff4040');R(x+1,y-1,1,1,'#ff4040');
  if(fl){R(x-9,y-4,6,2,'#3a2060');R(x+3,y-4,6,2,'#3a2060');R(x-10,y-2,2,2,'#3a2060');R(x+8,y-2,2,2,'#3a2060')}else{R(x-9,y,6,2,'#3a2060');R(x+3,y,6,2,'#3a2060');R(x-10,y+2,2,1,'#3a2060');R(x+8,y+2,2,1,'#3a2060')}}
 function hawk(x,y,t,f){const fl=Math.floor(t*10)%2,B=(dx,dy,w,h,col)=>R(mir(x+dx,w,f,x),y+dy,w,h,col);

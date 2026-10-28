@@ -1,7 +1,7 @@
 # Melissaette 24x32 sprite generator (source of truth; exported into src/c_art.js as pixel strings).
 # Painted in layers with region ids, then auto-outlined (outer + selected inner seams), like hand pixel art.
 W,H=24,32
-PAL={'k':'#1a1238','h':'#d8d8e8','H':'#d8d8e8','y':'#a8532a','Y':'#6e2e16','l':'#d98a4e','b':'#5aa2ff','d':'#3270d8','B':'#86bcff',
+PAL={'k':'#1a1238','h':'#d8d8e8','H':'#d8d8e8','y':'#a8532a','Y':'#6e2e16','l':'#d98a4e','b':'#f6c9a4','d':'#d9906e','B':'#ffe2c8',
      'w':'#fbd6e0','g':'#e9a9bd','e':'#ffffff','p':'#1a1238','i':'#5d7fae','c':'#ff92b4','m':'#a3122c','s':'#c8304a','S':'#8a1c30',
      'f':'#e0405e','v':'#9a8ad8','o':'#f2c230','n':'#1a1a22'}
 def new():return [['.' ]*W for _ in range(H)],[[None]*W for _ in range(H)]
