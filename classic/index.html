@@ -875,7 +875,7 @@ function togglePause(){if(state!='play')return;paused=!paused;held={l:0,r:0,d:0,
 function chrome(){$('pause').style.display=state=='play'?'block':'none';$('mute').style.display='block';$('help').style.display=state=='title'||state=='play'?'block':'none';$('pause').textContent=paused?'▶':'⏸';$('pause').setAttribute('aria-label',paused?'Resume':'Pause');try{if(window.__dock)__dock.tick()}catch(e){}}
 function showHelp(){if(state=='play'&&!paused)togglePause();panelOpen=true;$('ptext').innerHTML=`<h2>👒 Melissa Time: Rescue in Gargamel's Castle</h2>
 <p>The wicked wizard <b>Gargamel</b> and his cat <b>Azrael</b> have carried off Melissaette's Smurf friends! Walk right, screen by screen, through the village, fields, hills, river, woods and cavern to the castle, and set everyone free.</p>
-<h3>Controls</h3><ul><li><b>Swipe</b> anywhere: drag sideways to walk (she keeps walking while your finger stays down and stops when you let go), swipe up to jump, swipe down to duck (under low bats, hawks and spiders). Tap to hop.</li><li><b>A</b>: jump. Tap for a hop, <b>hold for a higher jump</b>.</li><li><b>B</b>: hold to <b>run</b> faster (hold B while swiping right, then A for a long jump).</li><li><b>Big Leap</b>: tap A again <i>right away</i> while rising, just like the 1982 classic.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, Shift or X to run, P pause, M mute.</li></ul><h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
+<h3>Controls</h3><ul><li>🎮 <b>Controller</b> (Xbox, PlayStation or Switch; USB or Bluetooth, on a computer or paired to your phone): stick or D-pad to walk and duck, <b>A</b> jump (hold for higher), <b>B</b> or <b>X</b> run, <b>Start</b> pause, <b>Select</b> sound. Menus: D-pad + A, B goes back.</li><li><b>Swipe</b> anywhere: drag sideways to walk (she keeps walking while your finger stays down and stops when you let go), swipe up to jump, swipe down to duck (under low bats, hawks and spiders). Tap to hop.</li><li><b>A</b>: jump. Tap for a hop, <b>hold for a higher jump</b>.</li><li><b>B</b>: hold to <b>run</b> faster (hold B while swiping right, then A for a long jump).</li><li><b>Big Leap</b>: tap A again <i>right away</i> while rising, just like the 1982 classic.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, Shift or X to run, P pause, M mute.</li></ul><h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Gargamel throws slippery potions, spells and nets. Azrael pounces and knocks things down from trees.</li></ul>
 <h3>Energy</h3><p>Her energy drains as she walks and refills only when she reaches a <b>new land</b>. Leftover energy is bonus points!</p>
 <h3>Gifts</h3><ul><li>🫧 Bubble shield: saves you from one oops.</li><li>👟 Spring shoes: higher jumps for 20 s.</li><li>🐌 Snail-time: slows critters and villains.</li><li>🧁 Cupcake: +50 energy.</li></ul>
 <h3>🎵 Soundtrack</h3><p>Every land plays its own 8-bit 80s movie hit: Pretty in Pink, Don't You (Forget About Me), Footloose, Girls Just Want to Have Fun, The Power of Love, Take My Breath Away, Ghostbusters and Danger Zone, with The Time of My Life on the title and parade.</p><h3>🕯️ 54 birthday candles</h3><p>54 candles are hidden along the way. Some only appear when you get close, and some need a high jump or a Big Leap. Candles you've found stay found on this device. Find all 54 for a secret birthday surprise at the end!</p>
@@ -1235,4 +1235,30 @@ async function postNow(){if(!G)return;const F=x=>x==null?()=>undefined:typeof x=
   return show()}
 const api={init,postNow,syncBest,localBest,gameOver,submitQuiet,watch,show,close,isOpen:()=>open,get backend(){return REMOTE?REMOTE.name:'local'},_t:{cleanName,nameError,fmt,boardId,pid,keyOf}};
 window.PALB=api})();
-</script><script>PALB.init({"game": "melissaette-bday-c38938", "title": "Melissa Time", "order": "desc", "unit": "pts", "min": 0, "max": 10000000, "boards": null, "watch": [{"when": "state==='over'||state==='parade'", "score": "G&&G.score"}]})</script><!--/lb--></body></html>
+</script><script>PALB.init({"game": "melissaette-bday-c38938", "title": "Melissa Time", "order": "desc", "unit": "pts", "min": 0, "max": 10000000, "boards": null, "watch": [{"when": "state==='over'||state==='parade'", "score": "G&&G.score"}]})</script><!--/lb--><!-- gamepad:start -->
+<script src="gamepad.js?v=2"></script>
+<script>
+(function(){
+function ov(){return !!document.querySelector('#palbOv.on,#smpLock.on')}
+function playing(){return state=='play'&&!paused&&!panelOpen}
+function kc(code){return function(p){if(state=='parade'||state=='cake'){if(p){GamepadSupport.key('Enter',true);GamepadSupport.key('Enter',false)}return}if(!playing()&&p)return;GamepadSupport.key(code,p)}}
+GamepadSupport.init({
+ keys:{left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',a:kc('Space'),b:kc('KeyX'),x:kc('KeyX'),rt:kc('KeyX'),
+  start:function(p){if(p&&state=='play'&&!panelOpen)togglePause()},
+  back:function(p){if(p)setMute(!muted)}},
+ noRepeat:['start','back'],repeat:false,
+ ignoreSel:'#dock,#mute,#pause,#inst,#ios,.tb,#dockHint',
+ menu:function(){return ov()||panelOpen||paused||!(state=='play'||state=='parade')},
+ items:GamepadSupport.list(function(){if(ov()||panelOpen)return [];return menuBtns.slice()},{scale:1}),
+ isPaused:function(){return state=='play'&&paused},
+ pause:function(){if(state=='play'&&!paused)togglePause()},
+ back:function(){if(ov())return false;
+  if(panelOpen){var c=document.getElementById('pclose');if(c)c.click();return true}
+  if(state=='play'&&paused){togglePause();return true}
+  return true;},
+ hint:{text:'🎮 Controller: stick/D-pad walk · A jump · B or X run · Start pause',when:function(){return state=='title'&&!ov()&&!panelOpen}}
+});
+})();
+</script>
+<!-- gamepad:end -->
+</body></html>
