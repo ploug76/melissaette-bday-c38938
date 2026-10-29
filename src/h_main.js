@@ -14,7 +14,7 @@ function togglePause(){if(state!='play')return;paused=!paused;held={l:0,r:0,d:0,
 function chrome(){$('pause').style.display=state=='play'?'block':'none';$('mute').style.display='block';$('help').style.display=state=='title'||state=='play'?'block':'none';$('pause').textContent=paused?'▶':'⏸';$('pause').setAttribute('aria-label',paused?'Resume':'Pause');try{if(window.__dock)__dock.tick()}catch(e){}}
 function showHelp(){if(state=='play'&&!paused)togglePause();panelOpen=true;$('ptext').innerHTML=`<h2>🎂 Melissa Time: The Great Birthday Rescue</h2>
 <p>Grumpy <b>Baron Humbug</b>, who hates birthday parties, and his sneaky raccoon <b>Smudge</b> have carried off Melissaette's seven woodland Party Pals! Walk right, screen by screen, through the village, fields, hills, river, woods and cavern to the castle, and set everyone free.</p>
-<h3>Controls</h3><ul><li><b>D-pad</b> (bottom left): <b>◀ ▶</b> walk, <b>▲</b> jump, <b>▼</b> duck (under low bats, hawks and spiders). Slide your thumb to change direction; corners press two directions.</li><li><b>A</b>: jump. Tap for a hop, <b>hold for a higher jump</b>.</li><li><b>B</b>: hold to <b>run</b> faster (hold B + ▶, then A for a long jump).</li><li><b>Big Leap</b>: tap A again <i>right away</i> while rising, for extra-long gaps.</li><li>Or touch the play area: swipe up to jump, swipe down to duck, drag sideways to walk, tap to hop.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, Shift or X to run, P pause, M mute.</li></ul><h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Baron Humbug throws slippery potions, spells and nets. Smudge pounces and knocks things down from trees.</li></ul>
+<h3>Controls</h3><ul><li><b>Swipe</b> anywhere: drag sideways to walk (she keeps walking while your finger stays down and stops when you let go), swipe up to jump, swipe down to duck (under low bats, hawks and spiders). Tap to hop.</li><li><b>A</b>: jump. Tap for a hop, <b>hold for a higher jump</b>.</li><li><b>B</b>: hold to <b>run</b> faster (hold B while swiping right, then A for a long jump).</li><li><b>Big Leap</b>: tap A again <i>right away</i> while rising, for extra-long gaps.</li><li>Keyboard: arrows / WASD, Space or ↑ to jump, ↓ to duck, Shift or X to run, P pause, M mute.</li></ul><h3>Watch out</h3><ul><li>Fences, spiky grass, stalagmites and castle spikes: one touch and she takes a pratfall.</li><li>Rivers and pits: don't fall in! Bridges crumble behind you, and trapdoors creak open.</li><li>Bats, hawks, spiders and snakes (not on STROLL skill).</li><li>Baron Humbug throws slippery potions, spells and nets. Smudge pounces and knocks things down from trees.</li></ul>
 <h3>Energy</h3><p>Her energy drains as she walks and refills only when she reaches a <b>new land</b>. Leftover energy is bonus points!</p>
 <h3>Gifts</h3><ul><li>🫧 Bubble shield: saves you from one oops.</li><li>👟 Spring shoes: higher jumps for 20 s.</li><li>🐌 Snail-time: slows critters and villains.</li><li>🧁 Cupcake: +50 energy.</li></ul>
 <h3>🎵 Soundtrack</h3><p>Every land plays its own 8-bit 80s movie hit: Pretty in Pink, Don't You (Forget About Me), Footloose, Girls Just Want to Have Fun, The Power of Love, Take My Breath Away, Ghostbusters and Danger Zone, with The Time of My Life on the title and parade.</p><h3>🕯️ 54 birthday candles</h3><p>54 candles are hidden along the way. Some only appear when you get close, and some need a high jump or a Big Leap. Candles you've found stay found on this device. Find all 54 for a secret birthday surprise at the end!</p>
@@ -27,7 +27,7 @@ $('pause').onclick=e=>{e.stopPropagation();A();togglePause()};
 $('help').onclick=e=>{e.stopPropagation();A();showHelp()};
 function songBanner(id){if(SONG_TITLES[id])setBanner('♪ '+SONG_TITLES[id],'#ff86a6')}
 function curMusic(){return state=='play'&&G?ZONES[G.zi].music:state=='parade'?'parade':state=='cake'?'bday':'title'}
-// ---------- input: retro controller (D-pad + B/A, multi-touch), play-area swipes, keyboard
+// ---------- input: B/A buttons (multi-touch), swipe anywhere (no D-pad, Peter 10/28), keyboard
 let held={l:0,r:0,d:0,j:0,b:0},keys={l:0,r:0,d:0,j:0,b:0},ptrs=new Map(),downBtn=null,padHeld={u:0,a:0};
 const inR=(b,x,y,p=0)=>x>=b.x-p&&x<=b.x+b.w+p&&y>=b.y-p&&y<=b.y+b.h+p;
 // D-pad: direction from the pad centre (8-way: diagonals press both), works even if the thumb slides off the pad
@@ -47,9 +47,7 @@ function resetInput(){ptrs.clear();keys={l:0,r:0,d:0,j:0,b:0};recompute()}
 c.addEventListener('pointerdown',e=>{e.preventDefault();A();if(!musicOn)playSong(curMusic());const x=e.clientX,y=e.clientY;
  if(state!='play'||paused){downBtn=menuBtns.find(b=>inR(b,x,y,4))||null;return}
  try{c.setPointerCapture(e.pointerId)}catch(_){}
- if(onPad(x,y)){ptrs.set(e.pointerId,{pad:padDirs(x,y)});recompute();return}
  const ab=abAt(x,y);if(ab.length){ptrs.set(e.pointerId,{ab});recompute();return}
- if(inPanel(x,y)){ptrs.set(e.pointerId,{dead:1});return}
  ptrs.set(e.pointerId,{x0:x,y0:y,t0:performance.now(),sw:[],moved:false});recompute()},{passive:false});
 c.addEventListener('pointermove',e=>{const q=ptrs.get(e.pointerId);if(!q||q.dead)return;const x=e.clientX,y=e.clientY;
  if(q.pad){const d=padDirs(x,y);if(d.join()!=q.pad.join()){q.pad=d;recompute()}return}

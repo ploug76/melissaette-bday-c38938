@@ -25,14 +25,8 @@ function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath(
 function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
  if(L.portrait){const pn=L.panel[0];txt('MELISSA TIME',(L.ab.b.cx+L.ab.a.cx)/2,pn.y+24,fitSize('MELISSA TIME',16,L.ab.a.cx-L.ab.b.cx+2*L.ab.a.r),'#ff86a6','center',{f:MONO})}
- // D-pad
- g.save();g.shadowColor='rgba(0,0,0,.5)';g.shadowOffsetY=4;padPath(cx,cy,a,a);g.fillStyle='#111015';g.fill();g.restore();
- const lit={l:held.l,r:held.r,u:held.j&&padHeld.u,d:held.d};
- const arm={l:[cx-a,cy],r:[cx+a,cy],u:[cx,cy-a],d:[cx,cy+a]},ang={l:PI,r:0,u:-PI/2,d:PI/2};
- for(const k of ['l','r','u','d']){const [x,y]=arm[k];if(lit[k]){rr(x-a/2+3,y-a/2+3,a-6,a-6,8,'rgba(255,216,74,.85)',null)}tri(x+(k=='l'?-a*.08:k=='r'?a*.08:0),y+(k=='u'?-a*.08:k=='d'?a*.08:0),a*.22,ang[k],lit[k]?'#1b1440':'#8f8c99')}
- g.beginPath();g.arc(cx,cy,a*.22,0,TAU);g.fillStyle='#1d1b22';g.fill();g.strokeStyle='#3a3742';g.lineWidth=2;g.stroke();
- txt('JUMP',cx+a*.6,cy-a*1.2,16,'#cfcad8','left');txt('DUCK',cx+a*.6,cy+a*1.2,16,'#cfcad8','left');
- reg('btn:pad',cx-1.5*a,cy-1.5*a,3*a,3*a);
+ // no D-pad (Peter 10/28): swipe anywhere to move; hint where the pad used to be
+ {const hw=Math.min(3*a,(L.portrait?L.ab.b.cx-L.ab.b.r-cx:a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
  // B / A
  for(const k of ['b','a']){const q=L.ab[k],on=k=='a'?held.j&&padHeld.a:held.b;const dy=on?2:0;
   g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
