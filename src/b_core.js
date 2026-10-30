@@ -21,21 +21,24 @@ function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T=SAFE.t,B=VH-SAFE.b,aw=R-L,
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:L+8,y:top+fh+4,w:aw-16,h:24};
   const py=Math.max(o.lane.y+o.lane.h+8,B-6-ph);o.panel=[{x:L+6,y:py,w:aw-12,h:B-6-py}];
   const cy=py+14+1.5*a+6;o.pad={cx:L+6+14+1.5*a,cy,a};
-  const ax=R-6-16-br,bx=ax-2*br-Math.max(12,Math.min(26,(ax-br-(o.pad.cx+1.5*a))-2*br-14));
-  o.ab={b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy-br*.35,r:br}};
+  // Oct 30 (Peter): JUMP (A) bottom-right, RUN (B) bottom-left, mirrored; swipe hint centered
+  const ax=R-6-16-br,bx=L+6+16+br;o.pad.cx=(L+R)/2;
+  o.ab={b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy+br*.35,r:br}};
   o.ctrlArea={x:L,y:py,w:aw,h:B-py}}
  else{o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42}];const top=T+54;const a=CL(Math.floor(ah*.15),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
   let fh=ah-54-32,fw=fh*4/3;if((aw-fw)/2<side){fw=aw-2*side;fh=fw*.75}if(fh>ah-54-32){fh=ah-86;fw=fh*4/3}
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:o.field.x,y:top+fh+4,w:fw,h:24};
   const sw=o.field.x-L,cy=B-10-1.5*a;o.pad={cx:L+sw/2,cy,a};
   const rx0=o.field.x+fw,rsw=R-rx0,acx=rx0+rsw/2+br+6,bcy=B-44-br;
-  o.ab={b:{cx:rx0+rsw/2-br-6,cy:bcy,r:br},a:{cx:acx,cy:bcy-br*.7,r:br}};
-  o.panel=[{x:L+4,y:cy-1.5*a-10,w:sw-8,h:B-4-(cy-1.5*a-10)},{x:rx0+4,y:o.ab.a.cy-br-12,w:rsw-8,h:B-4-(o.ab.a.cy-br-12)}];
+  // Oct 30 (Peter): JUMP (A) bottom-right, RUN (B) bottom-left, mirrored; swipe hint above RUN
+  o.ab={b:{cx:L+sw/2,cy:bcy,r:br},a:{cx:rx0+rsw/2,cy:bcy,r:br}};o.pad.cy=bcy-br-34;
+  const pty=o.pad.cy-32;
+  o.panel=[{x:L+4,y:pty,w:sw-8,h:B-4-pty},{x:rx0+4,y:pty,w:rsw-8,h:B-4-pty}];
   o.side=[{x:L+8,y:top,w:sw-16,h:Math.max(0,o.panel[0].y-top-8)},{x:rx0+8,y:top,w:rsw-16,h:Math.max(0,o.panel[1].y-top-8)}];
   o.ctrlArea=null}
  // bounding boxes (used by scene buttons / overlap tests); j = A button
  const bb=q=>({x:q.cx-q.r,y:q.cy-q.r,w:2*q.r,h:2*q.r});const P=o.pad;
- o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-1.5*P.a,w:3*P.a,h:3*P.a},b:bb(o.ab.b),j:bb(o.ab.a)};
+ o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-24,w:3*P.a,h:48},b:bb(o.ab.b),j:bb(o.ab.a)};
  o.ws=o.field.w/FW;return o}
 addEventListener('resize',onResize);
 const ovl=(a,b,p=0)=>a.x<b.x+b.w+p&&b.x<a.x+a.w+p&&a.y<b.y+b.h+p&&b.y<a.y+a.h+p;

@@ -26,7 +26,7 @@ function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
  if(L.portrait){const pn=L.panel[0];txt('MELISSA TIME',(L.ab.b.cx+L.ab.a.cx)/2,pn.y+24,fitSize('MELISSA TIME',16,L.ab.a.cx-L.ab.b.cx+2*L.ab.a.r),'#ff86a6','center',{f:MONO})}
  // no D-pad (Peter 10/28): swipe anywhere to move; hint where the pad used to be
- {const hw=Math.min(3*a,(L.portrait?L.ab.b.cx-L.ab.b.r-cx:a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
+ {const hw=Math.min(3*a,(L.portrait?Math.min(L.ab.a.cx-L.ab.a.r-cx,cx-L.ab.b.cx-L.ab.b.r):a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
  // B / A
  for(const k of ['b','a']){const q=L.ab[k],on=k=='a'?held.j&&padHeld.a:held.b;const dy=on?2:0;
   g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
