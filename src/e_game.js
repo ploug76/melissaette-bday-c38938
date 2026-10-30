@@ -75,7 +75,7 @@ function stepPlayer(G,IN){const p=G.p,S=spd(G);const jp=IN.j&&!p.jPrev;p.jPrev=I
   if(!q.one&&p.vy<0&&oy-p.h>=q.y+q.h-.01&&p.y-p.h<q.y+q.h){p.y=q.y+q.h+p.h;p.vy=0;p.cut=true;fx('sfx','bonk')}}
  if(landS>=0){const q=G.sol[landS];p.y=q.y;p.vy=0;p.on=true;p.gi=landS;if(!wasOn)land(G,p)}
  else p.gi=-1;
- if(!p.on)p.air+=DT;else{p.air=0;if(Math.abs(p.vx)>5)p.walkT+=DT}
+ if(!p.on)p.air+=DT;else{p.air=0;if(Math.abs(p.vx)>5)p.walkT+=DT*Math.min(1.6,Math.abs(p.vx)/RUN)}
  if(p.on&&p.gi>=0&&G.sol[p.gi].k=='plank'&&G.sol[p.gi].ct<0){G.sol[p.gi].ct=0;fx('sfx','crumble')}}
 function land(G,p){p.jl=1;p.jumping=false;p.big=false;p.bigUsed=true;fx('sfx','land');fx('dust',p.x,p.y);
  if(p.x>p.jx+6){let pts=0;for(const o of G.obs){if(!o.done&&o.x>=p.jx-4&&o.x+o.w<=p.x+4){o.done=1;pts+=o.pts}}if(pts)addScore(G,pts,p.x,p.y-26)}}

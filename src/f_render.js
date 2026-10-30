@@ -81,7 +81,7 @@ function drawPlayer(G,t){const p=G.p;if(p.inv>0&&G.ph=='play'&&Math.floor(t*14)%
  if(G.ph=='die'){const k=G.pht;if(p.dead=='tired'){drawFolk('mel','hurt',p.x,p.y,p.face,.7);R(p.x+6,p.y-26-k*6,3,3,'#fff');R(p.x+9,p.y-31-k*6,2,2,'#fff');return}
   g.save();g.translate(p.x,p.y-10);g.rotate((p.dead=='fall'?.4:1)*k*7*p.face);drawFolk('mel','hurt',0,10,p.face);g.restore();
   if(p.dead!='fall'){const hx=p.x-p.face*k*40,hy=p.y-26-k*50+k*k*60;R(hx-7,hy,14,3,'#fff');R(hx-4,hy-3,8,3,'#fff')}return}
- const fr=!p.on?'jump':Math.abs(p.vx)>8?['w1','stand','w2','stand'][Math.floor(p.walkT*10)%4]:(G.ph=='win'?(Math.floor(gt*3)%2?'cheer':'happy'):'stand');
+ const fr=!p.on?'jump':Math.abs(p.vx)>8?['r1','r2','r3','r4'][Math.floor(p.walkT*9)%4]:(G.ph=='win'?(Math.floor(gt*3)%2?'cheer':'happy'):'stand');
  drawFolk('mel',p.net>0?'hurt':fr,p.x,p.y,p.face,p.duck?.62:1);
  if(G.pw.spring>0){R(p.x-6,p.y-2,5,2,'#5edc78');R(p.x+1,p.y-2,5,2,'#5edc78')}
  if(p.slip&&Math.abs(p.vx)>20&&Math.floor(t*12)%2)R(p.x-p.face*6,p.y-3,3,2,'#bdfcc6');

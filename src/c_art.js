@@ -87,15 +87,15 @@ function wizard(x,y,f=1,t=0,pose=''){ // Baron Humbug: stout party-pooper in a t
  B(-3,-48+bob,1,3,'#cccccc');B(-4,-49+bob,3,1,'#cccccc')}                 // a snuffed-out candle wick stuck in the hat (he hates parties)
 function cat(x,y,f=1,t=0,pose='run'){ // Smudge the raccoon (Humbug's pet), anchor bottom centre, ~20x12
  const B=(dx,dy,w,h,col)=>R(mir(x+dx,w,f,x),y+dy,w,h,col);const o='#8e8e9c',s='#3a3a46',cr='#e8e8ee',M='#22222c';
- const leg=pose=='run'?(Math.floor(t*12)%2):0;
+ const ph=pose=='run'?Math.floor(t*14)%4:0,leg=[1,0,-1,0][ph],up=pose=='run'&&ph%2==1?1:0;
  const tail=(tx,ty)=>{B(tx,ty,6,3,o);B(tx+1,ty,1,3,s);B(tx+4,ty,1,3,s);B(tx-1,ty,1,3,s)};
  const head=(hx,hy)=>{B(hx,hy,9,7,o);B(hx,hy-2,2,2,s);B(hx+6,hy-2,2,2,s);B(hx,hy+2,9,2,M);B(hx+2,hy+2,1,1,cr);B(hx+6,hy+2,1,1,cr);B(hx+3,hy+5,6,2,cr);B(hx+8,hy+4,2,1,'#1a1a22')};
  if(pose=='crouch'){B(-9,-6,15,5,o);B(-6,-6,2,5,s);tail(-15,-5+(Math.floor(t*10)%2));head(4,-11);B(-8,-1,4,1,s);B(2,-1,4,1,s);return}
  if(pose=='sit'){B(-5,-10,10,10,o);B(-3,-8,6,7,cr);tail(5,-3);head(-4,-18);return}
- B(-8,-9,15,6,o);B(-6,-4,12,1,cr);                                        // body
- head(6,-14);                                                              // masked face
- tail(-14,-11+(pose=='pounce'?2:0));
- if(pose=='pounce'){B(-9,-3,4,2,s);B(5,-4,5,2,s)}else{B(-7+leg*2,-3,2,3,s);B(-3-leg*2,-3,2,3,s);B(2+leg*2,-3,2,3,s);B(5-leg*2,-3,2,3,s)}}
+ const by=-up;B(-8,-9+by,15,6,o);B(-6,-4+by,12,1,cr);                                        // body
+ head(6,-14+by);                                                              // masked face
+ tail(-14,-11+by+(pose=='pounce'?2:0));
+ if(pose=='pounce'){B(-9,-3,4,2,s);B(5,-4,5,2,s)}else{const L=(lx,d,lift)=>B(lx+d,-3-up,2,3+up-lift,s);L(-7,leg*2,ph==1?1:0);L(-3,-leg*2,ph==3?1:0);L(2,leg*2,ph==1?1:0);L(5,-leg*2,ph==3?1:0)}}
 function bat(x,y,t){const fl=Math.floor(t*14)%2;R(x-3,y-2,6,5,'#5a3a8a');R(x-2,y-1,1,1,'#ff4040');R(x+1,y-1,1,1,'#ff4040');
  if(fl){R(x-9,y-4,6,2,'#3a2060');R(x+3,y-4,6,2,'#3a2060');R(x-10,y-2,2,2,'#3a2060');R(x+8,y-2,2,2,'#3a2060')}else{R(x-9,y,6,2,'#3a2060');R(x+3,y,6,2,'#3a2060');R(x-10,y+2,2,1,'#3a2060');R(x+8,y+2,2,1,'#3a2060')}}
 function hawk(x,y,t,f){const fl=Math.floor(t*10)%2,B=(dx,dy,w,h,col)=>R(mir(x+dx,w,f,x),y+dy,w,h,col);
