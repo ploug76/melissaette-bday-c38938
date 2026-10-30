@@ -86,8 +86,14 @@ function hurt(G,why){const p=G.p;if(G.ph!='play'||p.inv>0)return;
  G.ph='die';G.pht=0;p.dead=why;p.vx=0;p.net=0;G.deaths++;
  if(why=='fall'){fx('sfx','fall');if(ZONES[G.zi].theme=='river'||ZONES[G.zi].theme=='castle')fx('splashfx',p.x)}else if(why=='tired'){fx('sfx','over');p.vy=0}else{fx('sfx','hit');p.vy=-210;vib(80)}
  fx('banner',why=='tired'?'Too tired… she needs a rest!':why=='fall'?'Oops! Splash!':'Ouch! What a pratfall!','#ff7978')}
+/* respawn fix (Oct 30): blinking pit falls are free; respawns land on solid ground, backed off the pit edge */
+function rfGr(G,x){if(x<3||x>FW-3)return null;const a=topAt(G,x-4,0),b=topAt(G,x,0),c=topAt(G,x+4,0);if(!(a<999&&b<999&&c<999&&Math.abs(a-b)<2&&Math.abs(c-b)<2))return null;for(const h of G.haz)if(x+6>h.x&&x-6<h.x+h.w&&h.y<b+2&&h.y+h.h>b-22)return null;return b}
+function rfFits(G,x,f){const y=rfGr(G,x);if(y==null)return null;for(let k=2;k<=12;k+=2){const t=rfGr(G,x+f*k);if(t==null||Math.abs(t-y)>1)return null}return y}
+function rfSpot(G,x,f){for(let k=0;k<=160;k+=2){const a=x-f*k,y=rfFits(G,a,f);if(y!=null)return{x:a,y}}for(let k=2;k<=200;k+=2){const a=x+f*k,y=rfFits(G,a,f)!=null?rfFits(G,a,f):rfFits(G,a,-f);if(y!=null)return{x:a,y}}return null}
+function rfRestore(G){const p=G.p,s=(p.safe&&p.safe.ri==G.ri)?p.safe:{x:G.entryX},f=Math.sign(p.x-s.x)||(G.entryX<128?1:-1),sp=rfSpot(G,s.x,f);if(!sp)return;p.x=sp.x;p.y=sp.y;p.vx=0;p.vy=0;p.on=true;p.jumping=false;p.inv=Math.max(p.inv,1)}
+function rfPlace(G){const p=G.p,f=G.entryX<128?1:-1,sp=rfSpot(G,p.x,f);if(sp){p.x=sp.x;p.y=sp.y}}
 function respawn(G){G.lives--;if(G.lives<=0){G.ph='over';return}
- G.energy=100;const x=G.entryX;G.p=newPlayer(x);G.p.face=x>128?-1:1;buildScreen(G,1);G.p.inv=1.4;G.ph='play'}
+ G.energy=100;const x=G.entryX;G.p=newPlayer(x);G.p.face=x>128?-1:1;buildScreen(G,1);rfPlace(G);G.p.inv=1.4;G.ph='play'}
 // ---------- moving the world
 function step(G,IN){G.gt+=DT;const p=G.p;
  if(G.ph=='die'){G.pht+=DT;if(p.dead!='tired'){p.vy+=900*DT;p.y+=p.vy*DT}if(G.pht>1.7)respawn(G);return}
@@ -145,7 +151,8 @@ function step(G,IN){G.gt+=DT;const p=G.p;
  if(G.ph!='play')return;
  // hazards
  if(p.inv<=0)for(const h of G.haz){if(ovl(pb,{x:h.x+1,y:h.y+1,w:h.w-2,h:h.h-1})){hurt(G,h.k);return}}
- if(p.y>FH+18){hurt(G,'fall');return}
+ if(p.on&&rfGr(G,p.x)!=null)p.safe={x:p.x,ri:G.ri};
+ if(p.y>FH+18){if(p.inv>0){rfRestore(G);return}hurt(G,'fall');return}
  // items
  for(const it of G.items){if(it.got)continue;
   if(it.k=='candle'){if(it.hid&&!it.rev&&Math.abs(p.x-it.x)<40&&Math.abs(p.y-it.y)<70){it.rev=1;fx('sfx','ghost');fx('spark',it.x,it.y-6)}
