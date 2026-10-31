@@ -61,7 +61,13 @@ function palRows(id,fr){const W=16,H=24,G=[...Array(H)].map(()=>Array(W).fill('.
  if(id=='poppy'){P(15,11,'k');P(15,13,'k');P(13,4,'r');P(14,3,'r');P(14,5,'r');P(15,4,'r');P(14,4,'o')}
  if(id=='clover'){P(10,4,'r');P(11,3,'r');P(11,4,'r');P(10,3,'r');P(9,5,'A')}
  return O.map(r=>r.join(''))}
-function buildFolk(){{const o={},L={};for(const k in MELF){o[k]=mk(MELF[k],MELP);L[k]=flipC(o[k])}SPR.mel={r:o,l:L}}
+// facing check (Oct 30 2026): moving frames turn Mel's face 3/4 toward travel (sprite faces right; mirrored for left)
+function melTurn(src){const R=src.map(r=>r.padEnd(24,'.').split(''));const ey=R.findIndex(r=>r.join('').includes('eee'));if(ey<2)return src;
+ for(let y=ey-2;y<ey+5;y++){const r=R[y],seg=r.slice(6,20),n=r.slice();for(let i=0;i<14;i++)n[8+i]=seg[i];n[6]='y';n[7]='y';if(!'.k'.includes(n[21])&&n[22]=='.')n[22]='k';R[y]=n}
+ for(const y of [ey+5,ey+6]){const r=R[y],seg=r.slice(8,18);for(let i=0;i<10;i++)r[10+i]=seg[i];r[8]='y';r[9]='y'}
+ for(const y of [ey,ey+1,ey+2]){const r=R[y];for(let x=8;x<14;x++)if('eip'.includes(r[x])){r[x]='b';break}}
+ R[ey+2][21]='b';R[ey+2][22]='k';return R.map(r=>r.join(''))}
+function buildFolk(){{const o={},L={};for(const k in MELF){o[k]=mk(/^(w1|w2|r\d)$/.test(k)?melTurn(MELF[k]):MELF[k],MELP);L[k]=flipC(o[k])}o.jumpT=mk(melTurn(MELF.jump),MELP);L.jumpT=flipC(o.jumpT);SPR.mel={r:o,l:L}}
  for(const [id] of FRIENDS){const pal=Object.assign({k:'#1a1238',e:'#ffffff',o:'#ffd84a'},PALPAL[id]),o={};
   for(const fr of ['stand','w1','w2','jump','happy','hurt'])o[fr]=mk(palRows(id,fr),pal);
   const L={};for(const k in o)L[k]=flipC(o[k]);SPR[id]={r:o,l:L}}}
