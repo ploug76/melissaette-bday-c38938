@@ -48,18 +48,19 @@ function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T=SAFE.t,B=VH-SAFE.b,aw=R-L,
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:L+8,y:top+fh+4,w:aw-16,h:24};
   const py=Math.max(o.lane.y+o.lane.h+8,B-6-ph);o.panel=[{x:L+6,y:py,w:aw-12,h:B-6-py}];
   const cy=py+14+1.5*a+6;o.pad={cx:L+6+14+1.5*a,cy,a};
-  // Oct 30 (Peter): JUMP (A) bottom-right, RUN (B) bottom-left, mirrored; swipe hint centered
-  const ax=R-6-16-br,bx=L+6+16+br;o.pad.cx=(L+R)/2;
-  o.ab={b:{cx:bx,cy:cy+br*.35,r:br},a:{cx:ax,cy:cy+br*.35,r:br}};
+  // Peter Oct 30 9:40 PM: cluster like his screenshot - JUMP big orange far bottom-right, RUN smaller green up-left of it; swipe hint on the left
+  const ra=CL(Math.round(aw*0.13),46,62),rb=Math.round(ra*0.84),ax=R-16-ra,ay=B-6-18-ra,bx=ax-ra-14-rb,by=Math.max(py+40+rb,ay-ra*0.84);
+  o.ab={b:{cx:bx,cy:by,r:rb},a:{cx:ax,cy:ay,r:ra}};o.pad.cx=(L+6+bx-rb)/2;o.pad.cy=Math.min(cy,by);
   o.ctrlArea={x:L,y:py,w:aw,h:B-py}}
  else{o.rows=[{x:L+8,y:T+6,w:aw-8-156,h:42}];const top=T+54;const a=CL(Math.floor(ah*.15),56,68),br=CL(Math.round(a*.6),33,40),side=Math.max(3*a+24,4*br+44);
   let fh=ah-54-32,fw=fh*4/3;if((aw-fw)/2<side){fw=aw-2*side;fh=fw*.75}if(fh>ah-54-32){fh=ah-86;fw=fh*4/3}
   o.field={x:L+(aw-fw)/2,y:top,w:fw,h:fh};o.lane={x:o.field.x,y:top+fh+4,w:fw,h:24};
   const sw=o.field.x-L,cy=B-10-1.5*a;o.pad={cx:L+sw/2,cy,a};
   const rx0=o.field.x+fw,rsw=R-rx0,acx=rx0+rsw/2+br+6,bcy=B-44-br;
-  // Oct 30 (Peter): JUMP (A) bottom-right, RUN (B) bottom-left, mirrored; swipe hint above RUN
-  o.ab={b:{cx:L+sw/2,cy:bcy,r:br},a:{cx:rx0+rsw/2,cy:bcy,r:br}};o.pad.cy=bcy-br-34;
-  const pty=o.pad.cy-32;
+  // Peter Oct 30 9:40 PM: cluster bottom-right - JUMP big orange in the corner, RUN smaller green up-left of it; swipe hint in the left panel
+  const big=CL(Math.round(ah*0.21),72,96),ra=Math.round(big/2),rb=Math.round(ra*0.82),ax=R-14-ra,ay=B-12-ra,bx=Math.max(rx0+8+rb,ax-ra-10-rb),by=B-12-big*0.18-rb;
+  o.ab={b:{cx:bx,cy:by,r:rb},a:{cx:ax,cy:ay,r:ra}};
+  const pty=Math.min(cy-1.5*a-10,Math.min(by-rb,ay-ra)-14);
   o.panel=[{x:L+4,y:pty,w:sw-8,h:B-4-pty},{x:rx0+4,y:pty,w:rsw-8,h:B-4-pty}];
   o.side=[{x:L+8,y:top,w:sw-16,h:Math.max(0,o.panel[0].y-top-8)},{x:rx0+8,y:top,w:rsw-16,h:Math.max(0,o.panel[1].y-top-8)}];
   o.ctrlArea=null}
@@ -788,16 +789,15 @@ function padPath(cx,cy,a,w){const h=a*1.5,t=w/2;g.beginPath();g.moveTo(cx-t,cy-h
 function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath();g.moveTo(s,0);g.lineTo(-s*.7,-s*.85);g.lineTo(-s*.7,s*.85);g.closePath();g.fillStyle=col;g.fill();g.restore()}
 function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
- if(L.portrait){const pn=L.panel[0];txt('MELISSA TIME',(L.ab.b.cx+L.ab.a.cx)/2,pn.y+24,fitSize('MELISSA TIME',16,L.ab.a.cx-L.ab.b.cx+2*L.ab.a.r),'#ff86a6','center',{f:MONO})}
+ if(L.portrait){const pn=L.panel[0];txt('MELISSA TIME',(pn.x+L.ab.b.cx-L.ab.b.r)/2,pn.y+24,fitSize('MELISSA TIME',16,L.ab.b.cx-L.ab.b.r-pn.x-16),'#ff86a6','center',{f:MONO})}
  // no D-pad (Peter 10/28): swipe anywhere to move; hint where the pad used to be
- {const hw=Math.min(3*a,(L.portrait?Math.min(L.ab.a.cx-L.ab.a.r-cx,cx-L.ab.b.cx-L.ab.b.r):a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
+ {const hw=Math.min(3*a,(L.portrait?Math.min(L.ab.b.cx-L.ab.b.r-cx,cx-L.L-6):a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
  // B / A
  for(const k of ['b','a']){const q=L.ab[k],on=k=='a'?held.j&&padHeld.a:held.b;const dy=on?2:0;
   g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
-  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
+  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);{const gr=g.createRadialGradient(q.cx-q.r*.3,q.cy+dy-q.r*.4,q.r*.1,q.cx,q.cy+dy,q.r);if(k=='a'){gr.addColorStop(0,'#ffe0b0');gr.addColorStop(.55,'#ff8a1a');gr.addColorStop(1,'#a03a00')}else{gr.addColorStop(0,'#d8ffd0');gr.addColorStop(.55,'#38b040');gr.addColorStop(1,'#0a5a12')}g.fillStyle=gr}g.fill();g.lineWidth=3;g.strokeStyle='#fff';g.stroke();if(on){g.fillStyle='rgba(255,255,255,.22)';g.fill()}
   g.beginPath();g.arc(q.cx-q.r*.3,q.cy+dy-q.r*.35,q.r*.28,0,TAU);g.fillStyle='rgba(255,255,255,.28)';g.fill();
-  txt(k.toUpperCase(),q.cx,q.cy+dy+1,Math.round(q.r*.75),'#fff','center',{stroke:3,sc:'rgba(0,0,0,.45)'});
-  txt(k=='a'?'JUMP':'RUN',q.cx,q.cy+q.r+13,16,'#cfcad8','center');reg('btn:'+k,q.cx-q.r,q.cy-q.r,2*q.r,2*q.r)}}
+  {const s=k=='a'?'JUMP':'RUN';txt(s,q.cx,q.cy+dy+1,Math.round(q.r*(k=='a'?.5:.46)),'#fff','center',{stroke:5,sc:'#000'})}reg('btn:'+k,q.cx-q.r,q.cy-q.r,2*q.r,2*q.r)}}
 function w2s(x,y){return[LY.field.x+x*LY.ws,LY.field.y+y*LY.ws]}
 function drawPops(dt){const F=LY.field;for(const q of POPS){q.t+=dt;q.y-=18*dt}POPS=POPS.filter(q=>q.t<1.1);
  for(const q of POPS){let [sx,sy]=w2s(q.x,q.y);const sz=Math.max(12,Math.round(LY.ws*7));g.font=font(sz);const w=g.measureText(q.s).width+8,h=sz+6;let box={x:sx-w/2,y:sy-h/2,w,h};

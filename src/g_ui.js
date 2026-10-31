@@ -24,16 +24,15 @@ function padPath(cx,cy,a,w){const h=a*1.5,t=w/2;g.beginPath();g.moveTo(cx-t,cy-h
 function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath();g.moveTo(s,0);g.lineTo(-s*.7,-s*.85);g.lineTo(-s*.7,s*.85);g.closePath();g.fillStyle=col;g.fill();g.restore()}
 function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
- if(L.portrait){const pn=L.panel[0];txt('MELISSA TIME',(L.ab.b.cx+L.ab.a.cx)/2,pn.y+24,fitSize('MELISSA TIME',16,L.ab.a.cx-L.ab.b.cx+2*L.ab.a.r),'#ff86a6','center',{f:MONO})}
+ if(L.portrait){const pn=L.panel[0];txt('MELISSA TIME',(pn.x+L.ab.b.cx-L.ab.b.r)/2,pn.y+24,fitSize('MELISSA TIME',16,L.ab.b.cx-L.ab.b.r-pn.x-16),'#ff86a6','center',{f:MONO})}
  // no D-pad (Peter 10/28): swipe anywhere to move; hint where the pad used to be
- {const hw=Math.min(3*a,(L.portrait?Math.min(L.ab.a.cx-L.ab.a.r-cx,cx-L.ab.b.cx-L.ab.b.r):a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
+ {const hw=Math.min(3*a,(L.portrait?Math.min(L.ab.b.cx-L.ab.b.r-cx,cx-L.L-6):a*1.5)*2-8);txt('SWIPE',cx,cy-11,fitSize('SWIPE',16,hw),'#8f8c99','center',{f:MONO});txt('TO MOVE',cx,cy+11,fitSize('TO MOVE',16,hw),'#8f8c99','center',{f:MONO});reg('hint:swipe',cx-hw/2,cy-22,hw,44)}
  // B / A
  for(const k of ['b','a']){const q=L.ab[k],on=k=='a'?held.j&&padHeld.a:held.b;const dy=on?2:0;
   g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
-  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
+  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);{const gr=g.createRadialGradient(q.cx-q.r*.3,q.cy+dy-q.r*.4,q.r*.1,q.cx,q.cy+dy,q.r);if(k=='a'){gr.addColorStop(0,'#ffe0b0');gr.addColorStop(.55,'#ff8a1a');gr.addColorStop(1,'#a03a00')}else{gr.addColorStop(0,'#d8ffd0');gr.addColorStop(.55,'#38b040');gr.addColorStop(1,'#0a5a12')}g.fillStyle=gr}g.fill();g.lineWidth=3;g.strokeStyle='#fff';g.stroke();if(on){g.fillStyle='rgba(255,255,255,.22)';g.fill()}
   g.beginPath();g.arc(q.cx-q.r*.3,q.cy+dy-q.r*.35,q.r*.28,0,TAU);g.fillStyle='rgba(255,255,255,.28)';g.fill();
-  txt(k.toUpperCase(),q.cx,q.cy+dy+1,Math.round(q.r*.75),'#fff','center',{stroke:3,sc:'rgba(0,0,0,.45)'});
-  txt(k=='a'?'JUMP':'RUN',q.cx,q.cy+q.r+13,16,'#cfcad8','center');reg('btn:'+k,q.cx-q.r,q.cy-q.r,2*q.r,2*q.r)}}
+  {const s=k=='a'?'JUMP':'RUN';txt(s,q.cx,q.cy+dy+1,Math.round(q.r*(k=='a'?.5:.46)),'#fff','center',{stroke:5,sc:'#000'})}reg('btn:'+k,q.cx-q.r,q.cy-q.r,2*q.r,2*q.r)}}
 function w2s(x,y){return[LY.field.x+x*LY.ws,LY.field.y+y*LY.ws]}
 function drawPops(dt){const F=LY.field;for(const q of POPS){q.t+=dt;q.y-=18*dt}POPS=POPS.filter(q=>q.t<1.1);
  for(const q of POPS){let [sx,sy]=w2s(q.x,q.y);const sz=Math.max(12,Math.round(LY.ws*7));g.font=font(sz);const w=g.measureText(q.s).width+8,h=sz+6;let box={x:sx-w/2,y:sy-h/2,w,h};
